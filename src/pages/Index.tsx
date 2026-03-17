@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Index = () => {
   const { cart, addItem, removeItem, updateQuantity, clearCart } = useCart();
+  const { user, signOut } = useAuth();
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [mobileCartOpen, setMobileCartOpen] = useState(false);
 
