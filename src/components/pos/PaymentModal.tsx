@@ -35,6 +35,8 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
   const [cashAmount, setCashAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { user } = useAuth();
+  const [success, setSuccess] = useState(false);
 
   const cashNum = Number(cashAmount) || 0;
   const change = cashNum - cart.total;
