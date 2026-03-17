@@ -36,6 +36,12 @@ const Index = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </Button>
+          </Link>
           <Link to="/purchasing">
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
               <Truck className="h-3.5 w-3.5" />
