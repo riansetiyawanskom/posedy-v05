@@ -53,6 +53,14 @@ const App = () => (
               }
             />
             <Route
+              path="/transactions"
+              element={
+                <ProtectedRoute>
+                  <TransactionHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/user-management"
               element={
                 <ProtectedRoute>
