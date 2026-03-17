@@ -63,7 +63,8 @@ const Index = () => {
               onCheckout={() => setPaymentOpen(true)}
             />
           </SheetContent>
-        </Sheet>
+          </Sheet>
+        </div>
       </header>
 
       {/* Main content */}
