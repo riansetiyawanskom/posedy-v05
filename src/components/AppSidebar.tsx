@@ -6,6 +6,7 @@ import {
   Users,
   Package,
   LogOut,
+  History,
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
@@ -30,6 +31,7 @@ const navItems = [
   { title: "Produk", url: "/product-management", icon: Package },
   { title: "Pembelian", url: "/purchasing", icon: Truck },
   { title: "Stok Opname", url: "/stock-opname", icon: ClipboardCheck },
+  { title: "Riwayat", url: "/transactions", icon: History },
   { title: "User", url: "/user-management", icon: Users },
 ];
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
@@ -8,12 +8,14 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Banknote, CreditCard, Wallet, CheckCircle2, Loader2 } from "lucide-react";
+import { Banknote, CreditCard, Wallet, CheckCircle2, Loader2, Printer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRupiah } from "@/lib/format";
 import type { Cart } from "@/types/pos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { ReceiptPrint } from "./ReceiptPrint";
+import { printReceiptElement } from "@/lib/printReceipt";
 
 type PaymentMethod = "cash" | "card" | "ewallet";
 
@@ -35,6 +37,16 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
   const [cashAmount, setCashAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [receiptData, setReceiptData] = useState<{
+    orderNumber: string;
+    date: string;
+    cashierName: string;
+    cart: Cart;
+    paymentMethod: string;
+    cashAmount?: number;
+    change?: number;
+  } | null>(null);
+  const receiptRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
   const cashNum = Number(cashAmount) || 0;
@@ -46,11 +58,9 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
     setLoading(true);
 
     try {
-      // Generate order number
       const { data: orderNumData } = await supabase.rpc("generate_order_number");
       const orderNumber = orderNumData ?? `POS-${Date.now()}`;
 
-      // Insert order
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
@@ -68,7 +78,6 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
 
       if (orderError) throw orderError;
 
-      // Insert order items
       const items = cart.items.map((i) => ({
         order_id: order.id,
         product_id: i.product.id,
@@ -84,16 +93,25 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
 
       if (itemsError) throw itemsError;
 
+      // Prepare receipt data
+      setReceiptData({
+        orderNumber,
+        date: new Date().toLocaleString("id-ID", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        cashierName: user?.email ?? "Kasir",
+        cart: { ...cart },
+        paymentMethod: method,
+        cashAmount: method === "cash" ? cashNum : undefined,
+        change: method === "cash" ? Math.max(change, 0) : undefined,
+      });
+
       setSuccess(true);
       toast.success(`Pesanan ${orderNumber} berhasil!`);
-
-      setTimeout(() => {
-        setSuccess(false);
-        setCashAmount("");
-        setMethod("cash");
-        onSuccess();
-        onClose();
-      }, 1500);
     } catch (err: any) {
       toast.error("Gagal memproses pembayaran: " + (err?.message ?? "Unknown error"));
     } finally {
@@ -101,9 +119,25 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
     }
   };
 
+  const handlePrint = () => {
+    if (receiptRef.current) {
+      printReceiptElement(receiptRef.current);
+    }
+  };
+
+  const handleDone = () => {
+    setSuccess(false);
+    setReceiptData(null);
+    setCashAmount("");
+    setMethod("cash");
+    onSuccess();
+    onClose();
+  };
+
   const handleClose = () => {
     if (!loading) {
       setSuccess(false);
+      setReceiptData(null);
       setCashAmount("");
       setMethod("cash");
       onClose();
@@ -114,18 +148,39 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md bg-card border-border">
-        {success ? (
-          <div className="flex flex-col items-center justify-center py-10 animate-scale-in">
-            <CheckCircle2 className="h-16 w-16 text-accent" />
-            <p className="mt-4 text-lg font-bold text-card-foreground">
-              Pembayaran Berhasil!
-            </p>
-            {method === "cash" && change > 0 && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                Kembalian: <span className="font-mono font-bold text-accent">{formatRupiah(change)}</span>
+      <DialogContent className={cn("bg-card border-border", success ? "sm:max-w-sm" : "sm:max-w-md")}>
+        {success && receiptData ? (
+          <div className="space-y-4">
+            <div className="flex flex-col items-center gap-1 animate-scale-in">
+              <CheckCircle2 className="h-12 w-12 text-accent" />
+              <p className="text-lg font-bold text-card-foreground">
+                Pembayaran Berhasil!
               </p>
-            )}
+            </div>
+
+            {/* Receipt preview */}
+            <div className="max-h-[50vh] overflow-y-auto rounded-lg border border-border bg-white">
+              <ReceiptPrint ref={receiptRef} data={receiptData} />
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="flex-1 gap-2"
+                onClick={handlePrint}
+              >
+                <Printer className="h-4 w-4" />
+                Cetak Struk
+              </Button>
+              <Button
+                variant="pos"
+                className="flex-1"
+                onClick={handleDone}
+              >
+                Selesai
+              </Button>
+            </div>
           </div>
         ) : (
           <>

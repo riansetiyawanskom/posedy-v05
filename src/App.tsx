@@ -10,6 +10,7 @@ import Auth from "./pages/Auth.tsx";
 import ResetPassword from "./pages/ResetPassword.tsx";
 import Purchasing from "./pages/Purchasing.tsx";
 import StockOpname from "./pages/StockOpname.tsx";
+import TransactionHistory from "./pages/TransactionHistory.tsx";
 import UserManagement from "./pages/UserManagement.tsx";
 import ProductManagement from "./pages/ProductManagement.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
@@ -48,6 +49,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <StockOpname />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/transactions"
+              element={
+                <ProtectedRoute>
+                  <TransactionHistory />
                 </ProtectedRoute>
               }
             />
