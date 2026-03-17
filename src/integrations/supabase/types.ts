@@ -14,13 +14,111 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      permissions: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          slug: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          permission_id: string
+          role_id: string
+        }
+        Insert: {
+          permission_id: string
+          role_id: string
+        }
+        Update: {
+          permission_id?: string
+          role_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          role_id: string
+          user_id: string
+        }
+        Insert: {
+          role_id: string
+          user_id: string
+        }
+        Update: {
+          role_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      check_user_permission: {
+        Args: { required_permission: string; target_user_id: string }
+        Returns: boolean
+      }
+      has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
