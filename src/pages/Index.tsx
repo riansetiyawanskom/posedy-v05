@@ -54,6 +54,12 @@ const Index = () => {
               <span className="hidden sm:inline">Stok Opname</span>
             </Button>
           </Link>
+          <Link to="/product-management">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+              <Package className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Produk</span>
+            </Button>
+          </Link>
           <Link to="/user-management">
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
               <Users className="h-3.5 w-3.5" />
