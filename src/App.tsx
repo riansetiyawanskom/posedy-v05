@@ -40,6 +40,14 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/stock-opname"
+              element={
+                <ProtectedRoute>
+                  <StockOpname />
+                </ProtectedRoute>
+              }
+            />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
