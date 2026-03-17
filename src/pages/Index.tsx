@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Store, Menu, LogOut, Truck, ClipboardCheck, Users, LayoutDashboard } from "lucide-react";
+import { Store, Menu, LogOut, Truck, ClipboardCheck, Users, LayoutDashboard, Package } from "lucide-react";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { CartSidebar } from "@/components/pos/CartSidebar";
 import { PaymentModal } from "@/components/pos/PaymentModal";
@@ -52,6 +52,12 @@ const Index = () => {
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
               <ClipboardCheck className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Stok Opname</span>
+            </Button>
+          </Link>
+          <Link to="/product-management">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+              <Package className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Produk</span>
             </Button>
           </Link>
           <Link to="/user-management">
