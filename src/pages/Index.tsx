@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Store, Menu } from "lucide-react";
+import { Store, Menu, LogOut } from "lucide-react";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { CartSidebar } from "@/components/pos/CartSidebar";
 import { PaymentModal } from "@/components/pos/PaymentModal";
 import { useCart } from "@/hooks/useCart";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Index = () => {
   const { cart, addItem, removeItem, updateQuantity, clearCart } = useCart();
+  const { user, signOut } = useAuth();
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [mobileCartOpen, setMobileCartOpen] = useState(false);
 
@@ -32,7 +34,15 @@ const Index = () => {
           </h1>
         </div>
 
-        {/* Mobile cart trigger */}
+        <div className="flex items-center gap-2">
+          <span className="hidden text-xs text-muted-foreground sm:block">
+            {user?.email}
+          </span>
+          <Button variant="ghost" size="icon" onClick={signOut} title="Keluar">
+            <LogOut className="h-4 w-4" />
+          </Button>
+
+          {/* Mobile cart trigger */}
         <Sheet open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="relative lg:hidden">
@@ -53,7 +63,8 @@ const Index = () => {
               onCheckout={() => setPaymentOpen(true)}
             />
           </SheetContent>
-        </Sheet>
+          </Sheet>
+        </div>
       </header>
 
       {/* Main content */}

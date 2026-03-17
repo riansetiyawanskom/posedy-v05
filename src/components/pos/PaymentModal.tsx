@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
   const [cashAmount, setCashAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { user } = useAuth();
 
   const cashNum = Number(cashAmount) || 0;
   const change = cashNum - cart.total;
@@ -59,6 +61,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
           total: cart.total,
           payment_method: method,
           status: "completed",
+          cashier_id: user?.id,
         })
         .select("id")
         .single();
