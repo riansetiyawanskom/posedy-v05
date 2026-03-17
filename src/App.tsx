@@ -11,6 +11,7 @@ import ResetPassword from "./pages/ResetPassword.tsx";
 import Purchasing from "./pages/Purchasing.tsx";
 import StockOpname from "./pages/StockOpname.tsx";
 import UserManagement from "./pages/UserManagement.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -54,6 +55,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <UserManagement />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />

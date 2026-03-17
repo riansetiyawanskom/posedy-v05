@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Store, Menu, LogOut, Truck, ClipboardCheck, Users } from "lucide-react";
+import { Store, Menu, LogOut, Truck, ClipboardCheck, Users, LayoutDashboard } from "lucide-react";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { CartSidebar } from "@/components/pos/CartSidebar";
 import { PaymentModal } from "@/components/pos/PaymentModal";
@@ -36,6 +36,12 @@ const Index = () => {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Dashboard</span>
+            </Button>
+          </Link>
           <Link to="/purchasing">
             <Button variant="ghost" size="sm" className="gap-1.5 text-xs">
               <Truck className="h-3.5 w-3.5" />
