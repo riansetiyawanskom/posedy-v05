@@ -62,6 +62,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
           total: cart.total,
           payment_method: method,
           status: "completed",
+          cashier_id: user?.id,
         })
         .select("id")
         .single();
