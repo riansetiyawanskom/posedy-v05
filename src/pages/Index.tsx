@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Store, Menu, LogOut, Truck, ClipboardCheck, Users } from "lucide-react";
+import { Store, Menu, LogOut, Truck, ClipboardCheck, Users, LayoutDashboard } from "lucide-react";
 import { ProductGrid } from "@/components/pos/ProductGrid";
 import { CartSidebar } from "@/components/pos/CartSidebar";
 import { PaymentModal } from "@/components/pos/PaymentModal";
