@@ -345,6 +345,101 @@ export type Database = {
         }
         Relationships: []
       }
+      stock_adjustments: {
+        Row: {
+          adjusted_by: string
+          created_at: string
+          difference: number
+          id: string
+          notes: string | null
+          physical_stock: number
+          product_id: string
+          product_name: string
+          session_id: string
+          system_stock: number
+        }
+        Insert: {
+          adjusted_by: string
+          created_at?: string
+          difference?: number
+          id?: string
+          notes?: string | null
+          physical_stock: number
+          product_id: string
+          product_name: string
+          session_id: string
+          system_stock: number
+        }
+        Update: {
+          adjusted_by?: string
+          created_at?: string
+          difference?: number
+          id?: string
+          notes?: string | null
+          physical_stock?: number
+          product_id?: string
+          product_name?: string
+          session_id?: string
+          system_stock?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_adjustments_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_adjustments_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "stock_opname_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stock_opname_sessions: {
+        Row: {
+          category_id: string
+          closed_at: string | null
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          session_number: string
+          status: string
+        }
+        Insert: {
+          category_id: string
+          closed_at?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          session_number: string
+          status?: string
+        }
+        Update: {
+          category_id?: string
+          closed_at?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          session_number?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_opname_sessions_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suppliers: {
         Row: {
           address: string | null
@@ -413,6 +508,7 @@ export type Database = {
         Args: { required_permission: string; target_user_id: string }
         Returns: boolean
       }
+      generate_opname_number: { Args: never; Returns: string }
       generate_order_number: { Args: never; Returns: string }
       generate_po_number: { Args: never; Returns: string }
       has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
