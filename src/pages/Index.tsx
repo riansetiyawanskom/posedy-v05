@@ -1,16 +1,89 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { Store, Menu } from "lucide-react";
+import { ProductGrid } from "@/components/pos/ProductGrid";
+import { CartSidebar } from "@/components/pos/CartSidebar";
+import { PaymentModal } from "@/components/pos/PaymentModal";
+import { useCart } from "@/hooks/useCart";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
+  const { cart, addItem, removeItem, updateQuantity, clearCart } = useCart();
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [mobileCartOpen, setMobileCartOpen] = useState(false);
+
+  const handlePaymentSuccess = () => {
+    clearCart();
+    setMobileCartOpen(false);
+  };
+
+  const itemCount = cart.items.reduce((s, i) => s + i.quantity, 0);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="flex h-screen flex-col bg-background">
+      {/* Header */}
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
+            <Store className="h-4 w-4 text-accent-foreground" />
+          </div>
+          <h1 className="text-base font-extrabold tracking-tight text-card-foreground">
+            POS System
+          </h1>
+        </div>
+
+        {/* Mobile cart trigger */}
+        <Sheet open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="icon" className="relative lg:hidden">
+              <Menu className="h-4 w-4" />
+              {itemCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                  {itemCount}
+                </span>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[360px] p-0 bg-background border-border">
+            <CartSidebar
+              cart={cart}
+              onUpdateQuantity={updateQuantity}
+              onRemoveItem={removeItem}
+              onClearCart={clearCart}
+              onCheckout={() => setPaymentOpen(true)}
+            />
+          </SheetContent>
+        </Sheet>
+      </header>
+
+      {/* Main content */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Product grid */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          <ProductGrid onAddToCart={addItem} />
+        </main>
+
+        {/* Desktop cart sidebar */}
+        <aside className="hidden w-[380px] shrink-0 p-3 lg:block">
+          <CartSidebar
+            cart={cart}
+            onUpdateQuantity={updateQuantity}
+            onRemoveItem={removeItem}
+            onClearCart={clearCart}
+            onCheckout={() => setPaymentOpen(true)}
+          />
+        </aside>
+      </div>
+
+      {/* Payment modal */}
+      <PaymentModal
+        open={paymentOpen}
+        onClose={() => setPaymentOpen(false)}
+        cart={cart}
+        onSuccess={handlePaymentSuccess}
+      />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
