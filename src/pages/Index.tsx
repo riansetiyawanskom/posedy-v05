@@ -34,7 +34,15 @@ const Index = () => {
           </h1>
         </div>
 
-        {/* Mobile cart trigger */}
+        <div className="flex items-center gap-2">
+          <span className="hidden text-xs text-muted-foreground sm:block">
+            {user?.email}
+          </span>
+          <Button variant="ghost" size="icon" onClick={signOut} title="Keluar">
+            <LogOut className="h-4 w-4" />
+          </Button>
+
+          {/* Mobile cart trigger */}
         <Sheet open={mobileCartOpen} onOpenChange={setMobileCartOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="relative lg:hidden">
