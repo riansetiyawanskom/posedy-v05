@@ -32,7 +32,44 @@ export default function TransactionHistory() {
         .includes(search.toLowerCase())
   );
 
-  const handleViewDetail = async (order: OrderRow) => {
+  const handlePrint = async (order: OrderRow) => {
+    const items = await fetchOrderItems(order.id);
+    printOrderReceipt({
+      orderNumber: order.order_number,
+      date: formatDate(order.created_at),
+      paymentMethod: order.payment_method,
+      items: items.map((i) => ({
+        name: i.product_name,
+        quantity: i.quantity,
+        unitPrice: i.unit_price,
+        subtotal: i.subtotal,
+      })),
+      subtotal: order.subtotal,
+      discount: order.discount,
+      tax: order.tax,
+      total: order.total,
+    });
+  };
+
+  const handlePrintFromDetail = () => {
+    if (!detailOrder) return;
+    printOrderReceipt({
+      orderNumber: detailOrder.order_number,
+      date: formatDate(detailOrder.created_at),
+      paymentMethod: detailOrder.payment_method,
+      items: detailItems.map((i) => ({
+        name: i.product_name,
+        quantity: i.quantity,
+        unitPrice: i.unit_price,
+        subtotal: i.subtotal,
+      })),
+      subtotal: detailOrder.subtotal,
+      discount: detailOrder.discount,
+      tax: detailOrder.tax,
+      total: detailOrder.total,
+    });
+  };
+
     setDetailOrder(order);
     setLoadingDetail(true);
     try {
