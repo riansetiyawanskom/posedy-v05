@@ -65,6 +65,13 @@ export function ProductTable() {
             <TableBody>
               {filtered.map((p: any) => (
                 <TableRow key={p.id}>
+                  <TableCell className="w-12">
+                    {p.image_url ? (
+                      <img src={p.image_url} alt={p.name} className="h-9 w-9 rounded-md object-cover border border-border" />
+                    ) : (
+                      <div className="h-9 w-9 rounded-md bg-muted flex items-center justify-center text-muted-foreground text-xs">—</div>
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium text-card-foreground">{p.name}</TableCell>
                   <TableCell className="text-muted-foreground text-xs font-mono">{p.sku ?? "—"}</TableCell>
                   <TableCell className="text-muted-foreground text-sm">{p.categories?.name ?? "—"}</TableCell>
