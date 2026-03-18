@@ -70,6 +70,7 @@ export default function TransactionHistory() {
     });
   };
 
+  const handleViewDetail = async (order: OrderRow) => {
     setDetailOrder(order);
     setLoadingDetail(true);
     try {
