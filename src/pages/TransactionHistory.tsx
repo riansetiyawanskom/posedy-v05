@@ -282,6 +282,11 @@ export default function TransactionHistory() {
                   </div>
                 </div>
               )}
+
+              {/* Print button */}
+              <Button onClick={handlePrintFromDetail} className="w-full gap-2">
+                <Printer className="h-4 w-4" /> Cetak Struk
+              </Button>
             </div>
           )}
         </DialogContent>
