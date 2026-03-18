@@ -51,6 +51,7 @@ export function ProductTable() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-12"></TableHead>
                 <TableHead>Produk</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Kategori</TableHead>
