@@ -15,13 +15,24 @@ export function ProductCard({ product, onAdd }: ProductCardProps) {
       disabled={outOfStock}
       className="group relative flex flex-col items-start rounded-lg border border-border bg-card p-4 text-left transition-all hover:pos-shadow hover:border-accent/40 disabled:cursor-not-allowed disabled:opacity-50 animate-fade-in-up"
     >
+      {/* Product image */}
+      {product.image_url && (
+        <div className="mb-2 w-full overflow-hidden rounded-md aspect-[4/3]">
+          <img
+            src={product.image_url}
+            alt={product.name}
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          />
+        </div>
+      )}
+
       {/* Price badge */}
-      <div className="absolute right-3 top-3 rounded-md bg-primary px-2.5 py-1 font-mono text-xs font-medium text-primary-foreground">
+      <div className="absolute right-3 top-3 rounded-md bg-primary px-2.5 py-1 font-mono text-xs font-medium text-primary-foreground shadow-sm">
         {formatRupiah(product.price)}
       </div>
 
       {/* Product info */}
-      <div className="mt-1 flex w-full flex-col gap-1">
+      <div className="flex w-full flex-col gap-1">
         <h3 className="text-sm font-semibold text-card-foreground leading-tight pr-20">
           {product.name}
         </h3>
