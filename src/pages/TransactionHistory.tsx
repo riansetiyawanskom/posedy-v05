@@ -2,13 +2,14 @@ import { useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { useTransactionHistory, type OrderRow, type OrderItemRow } from "@/hooks/useTransactionHistory";
 import { formatRupiah } from "@/lib/format";
+import { printOrderReceipt } from "@/lib/printReceipt";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Eye, Receipt, Loader2 } from "lucide-react";
+import { Search, Eye, Receipt, Loader2, Printer } from "lucide-react";
 
 const methodLabel: Record<string, string> = {
   cash: "Tunai",
@@ -30,6 +31,44 @@ export default function TransactionHistory() {
         .toLowerCase()
         .includes(search.toLowerCase())
   );
+
+  const handlePrint = async (order: OrderRow) => {
+    const items = await fetchOrderItems(order.id);
+    printOrderReceipt({
+      orderNumber: order.order_number,
+      date: formatDate(order.created_at),
+      paymentMethod: order.payment_method,
+      items: items.map((i) => ({
+        name: i.product_name,
+        quantity: i.quantity,
+        unitPrice: i.unit_price,
+        subtotal: i.subtotal,
+      })),
+      subtotal: order.subtotal,
+      discount: order.discount,
+      tax: order.tax,
+      total: order.total,
+    });
+  };
+
+  const handlePrintFromDetail = () => {
+    if (!detailOrder) return;
+    printOrderReceipt({
+      orderNumber: detailOrder.order_number,
+      date: formatDate(detailOrder.created_at),
+      paymentMethod: detailOrder.payment_method,
+      items: detailItems.map((i) => ({
+        name: i.product_name,
+        quantity: i.quantity,
+        unitPrice: i.unit_price,
+        subtotal: i.subtotal,
+      })),
+      subtotal: detailOrder.subtotal,
+      discount: detailOrder.discount,
+      tax: detailOrder.tax,
+      total: detailOrder.total,
+    });
+  };
 
   const handleViewDetail = async (order: OrderRow) => {
     setDetailOrder(order);
@@ -128,13 +167,24 @@ export default function TransactionHistory() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleViewDetail(o)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          <div className="flex justify-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleViewDetail(o)}
+                              title="Lihat Detail"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handlePrint(o)}
+                              title="Cetak Struk"
+                            >
+                              <Printer className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -232,6 +282,11 @@ export default function TransactionHistory() {
                   </div>
                 </div>
               )}
+
+              {/* Print button */}
+              <Button onClick={handlePrintFromDetail} className="w-full gap-2">
+                <Printer className="h-4 w-4" /> Cetak Struk
+              </Button>
             </div>
           )}
         </DialogContent>
