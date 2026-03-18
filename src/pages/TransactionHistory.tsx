@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { format, startOfDay, endOfDay, isWithinInterval, subDays } from "date-fns";
+import { id as localeId } from "date-fns/locale";
 import { AppLayout } from "@/components/AppLayout";
 import { useTransactionHistory, type OrderRow, type OrderItemRow } from "@/hooks/useTransactionHistory";
 import { formatRupiah } from "@/lib/format";
@@ -8,8 +10,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Eye, Receipt, Loader2, Printer } from "lucide-react";
+import { Search, Eye, Receipt, Loader2, Printer, CalendarIcon, Download, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const methodLabel: Record<string, string> = {
   cash: "Tunai",
@@ -24,13 +29,29 @@ export default function TransactionHistory() {
   const [detailItems, setDetailItems] = useState<OrderItemRow[]>([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
-  const filtered = orders.filter(
-    (o) =>
-      o.order_number.toLowerCase().includes(search.toLowerCase()) ||
-      (methodLabel[o.payment_method] ?? o.payment_method)
-        .toLowerCase()
-        .includes(search.toLowerCase())
-  );
+  // Date range filter
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+
+  const filtered = useMemo(() => {
+    return orders.filter((o) => {
+      const matchSearch =
+        o.order_number.toLowerCase().includes(search.toLowerCase()) ||
+        (methodLabel[o.payment_method] ?? o.payment_method)
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+      let matchDate = true;
+      if (dateFrom || dateTo) {
+        const orderDate = new Date(o.created_at);
+        const from = dateFrom ? startOfDay(dateFrom) : new Date(0);
+        const to = dateTo ? endOfDay(dateTo) : new Date(9999, 11, 31);
+        matchDate = isWithinInterval(orderDate, { start: from, end: to });
+      }
+
+      return matchSearch && matchDate;
+    });
+  }, [orders, search, dateFrom, dateTo]);
 
   const handlePrint = async (order: OrderRow) => {
     const items = await fetchOrderItems(order.id);
@@ -81,6 +102,46 @@ export default function TransactionHistory() {
     }
   };
 
+  const handleExportCSV = () => {
+    if (filtered.length === 0) return;
+
+    const header = ["No. Order", "Tanggal", "Metode Bayar", "Subtotal", "Diskon", "Pajak", "Total", "Status"];
+    const rows = filtered.map((o) => [
+      o.order_number,
+      formatDate(o.created_at),
+      methodLabel[o.payment_method] ?? o.payment_method,
+      o.subtotal,
+      o.discount,
+      o.tax,
+      o.total,
+      o.status === "completed" ? "Selesai" : o.status,
+    ]);
+
+    const csvContent = [
+      header.join(","),
+      ...rows.map((r) => r.map((v) => `"${v}"`).join(",")),
+    ].join("\n");
+
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    const dateLabel = dateFrom || dateTo
+      ? `_${dateFrom ? format(dateFrom, "yyyyMMdd") : "awal"}-${dateTo ? format(dateTo, "yyyyMMdd") : "akhir"}`
+      : `_${format(new Date(), "yyyyMMdd")}`;
+
+    a.href = url;
+    a.download = `laporan-transaksi${dateLabel}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const clearDateFilter = () => {
+    setDateFrom(undefined);
+    setDateTo(undefined);
+  };
+
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("id-ID", {
       day: "2-digit",
@@ -90,23 +151,96 @@ export default function TransactionHistory() {
       minute: "2-digit",
     });
 
+  const totalRevenue = filtered.reduce((sum, o) => sum + o.total, 0);
+
   return (
     <AppLayout title="Riwayat Transaksi">
       <div className="p-4 lg:p-6 space-y-4">
-        {/* Search */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Cari no. order atau metode..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-card border-border"
-            />
+        {/* Filters row */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center flex-1">
+            {/* Search */}
+            <div className="relative flex-1 max-w-sm">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Cari no. order atau metode..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 bg-card border-border"
+              />
+            </div>
+
+            {/* Date From */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-[160px] justify-start text-left font-normal text-sm",
+                    !dateFrom && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                  {dateFrom ? format(dateFrom, "dd MMM yyyy", { locale: localeId }) : "Dari tanggal"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={setDateFrom}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {/* Date To */}
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-[160px] justify-start text-left font-normal text-sm",
+                    !dateTo && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                  {dateTo ? format(dateTo, "dd MMM yyyy", { locale: localeId }) : "Sampai tanggal"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={setDateTo}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              </PopoverContent>
+            </Popover>
+
+            {(dateFrom || dateTo) && (
+              <Button variant="ghost" size="icon" onClick={clearDateFilter} title="Hapus filter tanggal">
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
-          <Badge variant="secondary" className="text-xs">
-            {filtered.length} transaksi
-          </Badge>
+
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-xs whitespace-nowrap">
+              {filtered.length} transaksi • {formatRupiah(totalRevenue)}
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportCSV}
+              disabled={filtered.length === 0}
+              className="gap-1.5"
+            >
+              <Download className="h-3.5 w-3.5" /> Export CSV
+            </Button>
+          </div>
         </div>
 
         {/* Table */}
@@ -211,7 +345,6 @@ export default function TransactionHistory() {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Info */}
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-xs text-muted-foreground">Tanggal</p>
@@ -229,7 +362,6 @@ export default function TransactionHistory() {
                 </div>
               </div>
 
-              {/* Items table */}
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -259,7 +391,6 @@ export default function TransactionHistory() {
                 </TableBody>
               </Table>
 
-              {/* Totals */}
               {detailOrder && (
                 <div className="space-y-1 rounded-lg bg-muted p-4 text-sm">
                   <div className="flex justify-between">
@@ -283,7 +414,6 @@ export default function TransactionHistory() {
                 </div>
               )}
 
-              {/* Print button */}
               <Button onClick={handlePrintFromDetail} className="w-full gap-2">
                 <Printer className="h-4 w-4" /> Cetak Struk
               </Button>
