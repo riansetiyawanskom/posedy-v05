@@ -7,6 +7,7 @@ import {
   Package,
   LogOut,
   History,
+  FileText,
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
