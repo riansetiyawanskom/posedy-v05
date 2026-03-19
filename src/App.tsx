@@ -14,6 +14,7 @@ import TransactionHistory from "./pages/TransactionHistory.tsx";
 import UserManagement from "./pages/UserManagement.tsx";
 import ProductManagement from "./pages/ProductManagement.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import Reports from "./pages/Reports.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
