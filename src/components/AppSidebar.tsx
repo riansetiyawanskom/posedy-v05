@@ -33,6 +33,7 @@ const navItems = [
   { title: "Pembelian", url: "/purchasing", icon: Truck },
   { title: "Stok Opname", url: "/stock-opname", icon: ClipboardCheck },
   { title: "Riwayat", url: "/transactions", icon: History },
+  { title: "Laporan", url: "/reports", icon: FileText },
   { title: "User", url: "/user-management", icon: Users },
 ];
 
