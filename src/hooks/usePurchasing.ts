@@ -68,3 +68,77 @@ export function useReceivePO() {
     },
   });
 }
+
+export function useUpdatePO() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      poId,
+      supplierId,
+      notes,
+      items,
+    }: {
+      poId: string;
+      supplierId: string;
+      notes: string | null;
+      items: { product_id: string; product_name: string; quantity: number; unit_cost: number }[];
+    }) => {
+      const total = items.reduce((s, i) => s + i.quantity * i.unit_cost, 0);
+
+      // Update PO header
+      const { error: poErr } = await supabase
+        .from("purchase_orders")
+        .update({ supplier_id: supplierId, notes, total })
+        .eq("id", poId);
+      if (poErr) throw poErr;
+
+      // Delete old items then insert new
+      const { error: delErr } = await supabase
+        .from("purchase_order_items")
+        .delete()
+        .eq("purchase_order_id", poId);
+      if (delErr) throw delErr;
+
+      const poItems = items.map((i) => ({
+        purchase_order_id: poId,
+        product_id: i.product_id,
+        product_name: i.product_name,
+        quantity: i.quantity,
+        unit_cost: i.unit_cost,
+        subtotal: i.quantity * i.unit_cost,
+      }));
+
+      if (poItems.length > 0) {
+        const { error: insErr } = await supabase.from("purchase_order_items").insert(poItems);
+        if (insErr) throw insErr;
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["purchase_orders"] });
+      qc.invalidateQueries({ queryKey: ["purchase_order_items"] });
+    },
+  });
+}
+
+export function useDeletePO() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (poId: string) => {
+      // Delete items first
+      const { error: itemErr } = await supabase
+        .from("purchase_order_items")
+        .delete()
+        .eq("purchase_order_id", poId);
+      if (itemErr) throw itemErr;
+
+      const { error } = await supabase
+        .from("purchase_orders")
+        .delete()
+        .eq("id", poId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["purchase_orders"] });
+    },
+  });
+}
