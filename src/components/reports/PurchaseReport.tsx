@@ -66,6 +66,19 @@ export function PurchaseReport() {
     };
   }, [filtered]);
 
+  const dailyPurchases = useMemo(() => {
+    const map: Record<string, { total: number; count: number }> = {};
+    filtered.forEach((po) => {
+      const day = format(new Date(po.created_at), "dd/MM");
+      if (!map[day]) map[day] = { total: 0, count: 0 };
+      map[day].total += Number(po.total);
+      map[day].count += 1;
+    });
+    return Object.entries(map)
+      .map(([date, v]) => ({ date, ...v }))
+      .slice(-30);
+  }, [filtered]);
+
   const toggleRow = async (poId: string) => {
     const next = new Set(expandedRows);
     if (next.has(poId)) {
