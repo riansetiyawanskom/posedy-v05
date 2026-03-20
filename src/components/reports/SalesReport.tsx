@@ -12,6 +12,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface OrderItem {
   id: string;
@@ -70,6 +71,19 @@ export function SalesReport() {
       }),
       { revenue: 0, orders: 0, tax: 0, discount: 0 }
     );
+  }, [filtered]);
+
+  const dailySales = useMemo(() => {
+    const map: Record<string, { revenue: number; orders: number }> = {};
+    filtered.forEach((o) => {
+      const day = format(new Date(o.created_at!), "dd/MM");
+      if (!map[day]) map[day] = { revenue: 0, orders: 0 };
+      map[day].revenue += Number(o.total);
+      map[day].orders += 1;
+    });
+    return Object.entries(map)
+      .map(([date, v]) => ({ date, ...v }))
+      .slice(-30);
   }, [filtered]);
 
   const toggleRow = async (orderId: string) => {
@@ -166,6 +180,35 @@ export function SalesReport() {
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Pajak</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.tax)}</p></CardContent></Card>
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Diskon</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.discount)}</p></CardContent></Card>
       </div>
+
+      {/* Sales Trend Chart */}
+      {dailySales.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Tren Penjualan Harian</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dailySales}>
+                  <defs>
+                    <linearGradient id="salesGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}rb`} className="text-muted-foreground" />
+                  <Tooltip formatter={(value: number) => formatRupiah(value)} labelFormatter={(l) => `Tanggal: ${l}`} />
+                  <Area type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" fill="url(#salesGradient)" strokeWidth={2} name="Pendapatan" />
+                  <Area type="monotone" dataKey="orders" stroke="hsl(var(--accent-foreground))" fill="none" strokeWidth={1.5} strokeDasharray="4 4" name="Jumlah Order" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Table */}
       <Card>
