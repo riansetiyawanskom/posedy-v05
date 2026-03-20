@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export function ProfitLossReport() {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(subDays(new Date(), 30));
@@ -111,8 +112,23 @@ export function ProfitLossReport() {
 
     const netProfit = grossProfit - discount + tax;
 
-    return { revenue, cogs, grossProfit, tax, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length };
+    return { revenue, cogs, grossProfit, tax, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length, filteredOrders, filteredPO };
   }, [orders, orderItems, products, purchaseOrders, dateFrom, dateTo]);
+
+  const comparisonData = useMemo(() => {
+    const map: Record<string, { date: string; pendapatan: number; pengeluaran: number }> = {};
+    pnl.filteredOrders.forEach((o) => {
+      const day = format(new Date(o.created_at!), "dd/MM");
+      if (!map[day]) map[day] = { date: day, pendapatan: 0, pengeluaran: 0 };
+      map[day].pendapatan += Number(o.total);
+    });
+    pnl.filteredPO.forEach((po) => {
+      const day = format(new Date(po.received_at!), "dd/MM");
+      if (!map[day]) map[day] = { date: day, pendapatan: 0, pengeluaran: 0 };
+      map[day].pengeluaran += Number(po.total);
+    });
+    return Object.values(map).slice(-30);
+  }, [pnl.filteredOrders, pnl.filteredPO]);
 
   const handleExport = () => {
     const bom = "\uFEFF";
@@ -206,6 +222,30 @@ export function ProfitLossReport() {
           <CardContent><p className={cn("text-lg font-bold", pnl.netProfit < 0 && "text-destructive")}>{formatRupiah(pnl.netProfit)}</p></CardContent>
         </Card>
       </div>
+
+      {/* Revenue vs Expense Chart */}
+      {comparisonData.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Perbandingan Pendapatan vs Pengeluaran</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={comparisonData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}rb`} className="text-muted-foreground" />
+                  <Tooltip formatter={(value: number) => formatRupiah(value)} />
+                  <Legend />
+                  <Bar dataKey="pendapatan" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} name="Pendapatan" />
+                  <Bar dataKey="pengeluaran" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} name="Pengeluaran" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* P&L Statement */}
       <Card>
