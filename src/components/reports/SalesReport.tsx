@@ -73,6 +73,19 @@ export function SalesReport() {
     );
   }, [filtered]);
 
+  const dailySales = useMemo(() => {
+    const map: Record<string, { revenue: number; orders: number }> = {};
+    filtered.forEach((o) => {
+      const day = format(new Date(o.created_at!), "dd/MM");
+      if (!map[day]) map[day] = { revenue: 0, orders: 0 };
+      map[day].revenue += Number(o.total);
+      map[day].orders += 1;
+    });
+    return Object.entries(map)
+      .map(([date, v]) => ({ date, ...v }))
+      .slice(-30);
+  }, [filtered]);
+
   const toggleRow = async (orderId: string) => {
     const next = new Set(expandedRows);
     if (next.has(orderId)) {

@@ -172,6 +172,28 @@ export function PurchaseReport() {
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Nilai Diterima</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.totalReceived)}</p></CardContent></Card>
       </div>
 
+      {/* Purchase Trend Chart */}
+      {dailyPurchases.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Tren Pembelian Harian</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dailyPurchases}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}rb`} className="text-muted-foreground" />
+                  <Tooltip formatter={(value: number) => formatRupiah(value)} labelFormatter={(l) => `Tanggal: ${l}`} />
+                  <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Nilai Pembelian" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Table */}
       <Card>
         <Table>
