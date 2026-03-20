@@ -112,8 +112,23 @@ export function ProfitLossReport() {
 
     const netProfit = grossProfit - discount + tax;
 
-    return { revenue, cogs, grossProfit, tax, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length };
+    return { revenue, cogs, grossProfit, tax, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length, filteredOrders, filteredPO };
   }, [orders, orderItems, products, purchaseOrders, dateFrom, dateTo]);
+
+  const comparisonData = useMemo(() => {
+    const map: Record<string, { date: string; pendapatan: number; pengeluaran: number }> = {};
+    pnl.filteredOrders.forEach((o) => {
+      const day = format(new Date(o.created_at!), "dd/MM");
+      if (!map[day]) map[day] = { date: day, pendapatan: 0, pengeluaran: 0 };
+      map[day].pendapatan += Number(o.total);
+    });
+    pnl.filteredPO.forEach((po) => {
+      const day = format(new Date(po.received_at!), "dd/MM");
+      if (!map[day]) map[day] = { date: day, pendapatan: 0, pengeluaran: 0 };
+      map[day].pengeluaran += Number(po.total);
+    });
+    return Object.values(map).slice(-30);
+  }, [pnl.filteredOrders, pnl.filteredPO]);
 
   const handleExport = () => {
     const bom = "\uFEFF";
