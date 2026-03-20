@@ -223,6 +223,30 @@ export function ProfitLossReport() {
         </Card>
       </div>
 
+      {/* Revenue vs Expense Chart */}
+      {comparisonData.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm">Perbandingan Pendapatan vs Pengeluaran</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={comparisonData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                  <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}rb`} className="text-muted-foreground" />
+                  <Tooltip formatter={(value: number) => formatRupiah(value)} />
+                  <Legend />
+                  <Bar dataKey="pendapatan" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} name="Pendapatan" />
+                  <Bar dataKey="pengeluaran" fill="hsl(0, 84%, 60%)" radius={[4, 4, 0, 0]} name="Pengeluaran" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* P&L Statement */}
       <Card>
         <CardHeader>
