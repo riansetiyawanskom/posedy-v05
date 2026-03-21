@@ -332,7 +332,7 @@ export default function TransactionHistory() {
 
       {/* Detail Dialog */}
       <Dialog open={!!detailOrder} onOpenChange={() => setDetailOrder(null)}>
-        <DialogContent className="sm:max-w-lg bg-card border-border">
+        <DialogContent className="sm:max-w-2xl bg-card border-border">
           <DialogHeader>
             <DialogTitle className="text-card-foreground">
               Detail Transaksi — {detailOrder?.order_number}

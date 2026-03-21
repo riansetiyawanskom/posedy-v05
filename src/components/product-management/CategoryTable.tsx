@@ -91,11 +91,11 @@ export function CategoryTable() {
       )}
 
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>{editCat ? "Edit Kategori" : "Tambah Kategori"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div className="space-y-1.5">
               <Label htmlFor="cat-name">Nama Kategori *</Label>
               <Input id="cat-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={100} />
