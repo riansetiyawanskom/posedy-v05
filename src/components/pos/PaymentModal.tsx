@@ -148,7 +148,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className={cn("bg-card border-border", success ? "sm:max-w-sm" : "sm:max-w-md")}>
+      <DialogContent className={cn("bg-card border-border", success ? "sm:max-w-lg" : "sm:max-w-2xl")}>
         {success && receiptData ? (
           <div className="space-y-4">
             <div className="flex flex-col items-center gap-1 animate-scale-in">

@@ -72,8 +72,8 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
         <DialogHeader>
           <DialogTitle>{isEdit ? "Edit Produk" : "Tambah Produk"}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1.5 sm:col-span-2">
               <Label htmlFor="name">Nama Produk *</Label>
               <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={200} />

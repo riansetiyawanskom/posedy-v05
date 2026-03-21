@@ -75,7 +75,7 @@ export function SupplierList() {
               <Input placeholder="Contact Person" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} className="bg-card border-border" />
               <Input placeholder="Telepon" value={phone} onChange={(e) => setPhone(e.target.value)} className="bg-card border-border" />
               <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-card border-border" />
-              <Button variant="pos" className="w-full" disabled={saving}>
+              <Button variant="pos" className="w-full sm:col-span-2" disabled={saving}>
                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Simpan
               </Button>

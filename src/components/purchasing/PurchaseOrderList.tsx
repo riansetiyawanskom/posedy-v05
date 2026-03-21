@@ -237,7 +237,7 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
           <DialogHeader>
             <DialogTitle>Edit PO: {editPO?.po_number}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground">Supplier</label>
               <Select value={editSupplierId} onValueChange={setEditSupplierId}>
