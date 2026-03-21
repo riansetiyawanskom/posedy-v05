@@ -66,16 +66,16 @@ export function SupplierList() {
               Tambah Supplier
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md bg-card border-border">
+          <DialogContent className="sm:max-w-2xl bg-card border-border">
             <DialogHeader>
               <DialogTitle className="text-card-foreground">Tambah Supplier</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleAdd} className="space-y-3">
+            <form onSubmit={handleAdd} className="space-y-2.5 grid sm:grid-cols-2 gap-2.5">
               <Input placeholder="Nama Supplier *" value={name} onChange={(e) => setName(e.target.value)} required className="bg-card border-border" />
               <Input placeholder="Contact Person" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} className="bg-card border-border" />
               <Input placeholder="Telepon" value={phone} onChange={(e) => setPhone(e.target.value)} className="bg-card border-border" />
               <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-card border-border" />
-              <Button variant="pos" className="w-full" disabled={saving}>
+              <Button variant="pos" className="w-full sm:col-span-2" disabled={saving}>
                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Simpan
               </Button>
