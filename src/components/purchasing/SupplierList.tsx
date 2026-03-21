@@ -70,7 +70,7 @@ export function SupplierList() {
             <DialogHeader>
               <DialogTitle className="text-card-foreground">Tambah Supplier</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleAdd} className="space-y-3">
+            <form onSubmit={handleAdd} className="space-y-2.5 grid sm:grid-cols-2 gap-2.5">
               <Input placeholder="Nama Supplier *" value={name} onChange={(e) => setName(e.target.value)} required className="bg-card border-border" />
               <Input placeholder="Contact Person" value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} className="bg-card border-border" />
               <Input placeholder="Telepon" value={phone} onChange={(e) => setPhone(e.target.value)} className="bg-card border-border" />
