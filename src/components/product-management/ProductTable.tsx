@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Plus, Search, Printer } from "lucide-react";
 import { useAllProducts, useAllCategories, useDeleteProduct } from "@/hooks/useProductManagement";
 import { formatRupiah } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { ProductFormDialog } from "./ProductFormDialog";
+import { BarcodeDisplay, printBarcode } from "./BarcodeDisplay";
 
 export function ProductTable() {
   const { data: products, isLoading } = useAllProducts();
