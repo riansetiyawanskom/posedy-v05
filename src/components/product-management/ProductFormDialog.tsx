@@ -7,6 +7,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "./ImageUpload";
+import { BarcodeDisplay } from "./BarcodeDisplay";
+import { generateSKU } from "@/lib/generateSKU";
+import { RefreshCw } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -46,7 +49,7 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
         is_active: product.is_active ?? true,
       });
     } else {
-      setForm(empty);
+      setForm({ ...empty, sku: generateSKU() });
     }
   }, [product, open]);
 
@@ -76,8 +79,13 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
               <Input id="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required maxLength={200} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="sku">SKU</Label>
-              <Input id="sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} maxLength={50} />
+              <Label htmlFor="sku">SKU / Barcode</Label>
+              <div className="flex gap-1.5">
+                <Input id="sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} maxLength={50} className="flex-1" />
+                <Button type="button" variant="outline" size="icon" title="Generate SKU baru" onClick={() => setForm((f) => ({ ...f, sku: generateSKU() }))}>
+                  <RefreshCw className="h-3.5 w-3.5" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="category">Kategori</Label>
@@ -103,6 +111,13 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
               <Label htmlFor="stock">Stok</Label>
               <Input id="stock" type="number" min={0} value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} />
             </div>
+
+            {/* Barcode preview */}
+            {form.sku && (
+              <div className="sm:col-span-2 flex justify-center p-3 bg-muted/30 rounded-lg border border-border">
+                <BarcodeDisplay value={form.sku} height={35} width={1.2} fontSize={11} />
+              </div>
+            )}
 
             {/* Image Upload */}
             <div className="space-y-1.5 sm:col-span-2">

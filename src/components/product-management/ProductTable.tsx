@@ -74,7 +74,19 @@ export function ProductTable() {
                     )}
                   </TableCell>
                   <TableCell className="font-medium text-card-foreground">{p.name}</TableCell>
-                  <TableCell className="text-muted-foreground text-xs font-mono">{p.sku ?? "—"}</TableCell>
+                  <TableCell>
+                    {p.sku ? (
+                      <div className="flex items-center gap-1.5">
+                        <BarcodeDisplay value={p.sku} width={0.8} height={22} fontSize={8} className="hidden sm:block" />
+                        <span className="font-mono text-[10px] text-muted-foreground sm:hidden">{p.sku}</span>
+                        <Button variant="ghost" size="icon" className="h-6 w-6" title="Print Barcode" onClick={() => printBarcode(p.sku!, p.name)}>
+                          <Printer className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
+                  </TableCell>
                   <TableCell className="text-muted-foreground text-sm">{p.categories?.name ?? "—"}</TableCell>
                   <TableCell className="text-right font-mono text-sm">{formatRupiah(Number(p.price))}</TableCell>
                   <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatRupiah(Number(p.cost_price))}</TableCell>
