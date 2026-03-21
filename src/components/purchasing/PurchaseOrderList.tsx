@@ -233,7 +233,7 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
 
       {/* Edit Dialog */}
       <Dialog open={!!editPO} onOpenChange={(open) => !open && setEditPO(null)}>
-        <DialogContent className="max-w-xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit PO: {editPO?.po_number}</DialogTitle>
           </DialogHeader>
