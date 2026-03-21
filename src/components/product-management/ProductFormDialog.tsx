@@ -99,17 +99,21 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="price">Harga Jual *</Label>
-              <Input id="price" type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="cost">HPP</Label>
-              <Input id="cost" type="number" min={0} value={form.cost_price} onChange={(e) => setForm({ ...form, cost_price: Number(e.target.value) })} />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="stock">Stok</Label>
-              <Input id="stock" type="number" min={0} value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} />
+            <div className="space-y-1.5 sm:col-span-2">
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="price">Harga Jual *</Label>
+                  <Input id="price" type="number" min={0} value={form.price} onChange={(e) => setForm({ ...form, price: Number(e.target.value) })} required />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cost">HPP</Label>
+                  <Input id="cost" type="number" min={0} value={form.cost_price} onChange={(e) => setForm({ ...form, cost_price: Number(e.target.value) })} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="stock">Stok</Label>
+                  <Input id="stock" type="number" min={0} value={form.stock} onChange={(e) => setForm({ ...form, stock: Number(e.target.value) })} />
+                </div>
+              </div>
             </div>
 
             {/* Barcode preview */}
