@@ -66,7 +66,7 @@ export function SupplierList() {
               Tambah Supplier
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-md bg-card border-border">
+          <DialogContent className="sm:max-w-2xl bg-card border-border">
             <DialogHeader>
               <DialogTitle className="text-card-foreground">Tambah Supplier</DialogTitle>
             </DialogHeader>
