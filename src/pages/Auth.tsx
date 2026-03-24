@@ -66,6 +66,8 @@ export default function Auth() {
     setSubmitting(false);
     if (error) {
       toast.error(error.message);
+    } else {
+      logLogin(demoEmail);
     }
   };
 
