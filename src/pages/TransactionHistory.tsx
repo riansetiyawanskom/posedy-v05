@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { format, startOfDay, endOfDay, isWithinInterval, subDays } from "date-fns";
+import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { AppLayout } from "@/components/AppLayout";
 import { useTransactionHistory, type OrderRow, type OrderItemRow } from "@/hooks/useTransactionHistory";
@@ -12,8 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Search, Eye, Receipt, Loader2, Printer, CalendarIcon, Download, X } from "lucide-react";
+import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const methodLabel: Record<string, string> = {
@@ -25,11 +24,10 @@ const methodLabel: Record<string, string> = {
 export default function TransactionHistory() {
   const { orders, isLoading, fetchOrderItems } = useTransactionHistory();
   const [search, setSearch] = useState("");
-  const [detailOrder, setDetailOrder] = useState<OrderRow | null>(null);
-  const [detailItems, setDetailItems] = useState<OrderItemRow[]>([]);
-  const [loadingDetail, setLoadingDetail] = useState(false);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedItems, setExpandedItems] = useState<OrderItemRow[]>([]);
+  const [loadingExpand, setLoadingExpand] = useState(false);
 
-  // Date range filter
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
 
@@ -53,8 +51,29 @@ export default function TransactionHistory() {
     });
   }, [orders, search, dateFrom, dateTo]);
 
+  const handleToggleExpand = async (order: OrderRow) => {
+    if (expandedId === order.id) {
+      setExpandedId(null);
+      setExpandedItems([]);
+      return;
+    }
+    setExpandedId(order.id);
+    setLoadingExpand(true);
+    try {
+      const items = await fetchOrderItems(order.id);
+      setExpandedItems(items);
+    } finally {
+      setLoadingExpand(false);
+    }
+  };
+
   const handlePrint = async (order: OrderRow) => {
-    const items = await fetchOrderItems(order.id);
+    let items: OrderItemRow[];
+    if (expandedId === order.id && expandedItems.length > 0) {
+      items = expandedItems;
+    } else {
+      items = await fetchOrderItems(order.id);
+    }
     printOrderReceipt({
       orderNumber: order.order_number,
       date: formatDate(order.created_at),
@@ -70,36 +89,6 @@ export default function TransactionHistory() {
       tax: order.tax,
       total: order.total,
     });
-  };
-
-  const handlePrintFromDetail = () => {
-    if (!detailOrder) return;
-    printOrderReceipt({
-      orderNumber: detailOrder.order_number,
-      date: formatDate(detailOrder.created_at),
-      paymentMethod: detailOrder.payment_method,
-      items: detailItems.map((i) => ({
-        name: i.product_name,
-        quantity: i.quantity,
-        unitPrice: i.unit_price,
-        subtotal: i.subtotal,
-      })),
-      subtotal: detailOrder.subtotal,
-      discount: detailOrder.discount,
-      tax: detailOrder.tax,
-      total: detailOrder.total,
-    });
-  };
-
-  const handleViewDetail = async (order: OrderRow) => {
-    setDetailOrder(order);
-    setLoadingDetail(true);
-    try {
-      const items = await fetchOrderItems(order.id);
-      setDetailItems(items);
-    } finally {
-      setLoadingDetail(false);
-    }
   };
 
   const handleExportCSV = () => {
@@ -159,7 +148,6 @@ export default function TransactionHistory() {
         {/* Filters row */}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center flex-1">
-            {/* Search */}
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -170,7 +158,6 @@ export default function TransactionHistory() {
               />
             </div>
 
-            {/* Date From */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -185,17 +172,10 @@ export default function TransactionHistory() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateFrom}
-                  onSelect={setDateFrom}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
+                <Calendar mode="single" selected={dateFrom} onSelect={setDateFrom} initialFocus className="p-3 pointer-events-auto" />
               </PopoverContent>
             </Popover>
 
-            {/* Date To */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -210,13 +190,7 @@ export default function TransactionHistory() {
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dateTo}
-                  onSelect={setDateTo}
-                  initialFocus
-                  className={cn("p-3 pointer-events-auto")}
-                />
+                <Calendar mode="single" selected={dateTo} onSelect={setDateTo} initialFocus className="p-3 pointer-events-auto" />
               </PopoverContent>
             </Popover>
 
@@ -264,6 +238,7 @@ export default function TransactionHistory() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-8"></TableHead>
                       <TableHead>No. Order</TableHead>
                       <TableHead>Tanggal</TableHead>
                       <TableHead>Metode</TableHead>
@@ -273,55 +248,181 @@ export default function TransactionHistory() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filtered.map((o) => (
-                      <TableRow key={o.id}>
-                        <TableCell className="font-mono text-xs font-semibold text-card-foreground">
-                          {o.order_number}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {formatDate(o.created_at)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="text-xs">
-                            {methodLabel[o.payment_method] ?? o.payment_method}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right font-mono font-semibold text-card-foreground">
-                          {formatRupiah(o.total)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            className={
-                              o.status === "completed"
-                                ? "bg-accent text-accent-foreground"
-                                : "bg-muted text-muted-foreground"
-                            }
+                    {filtered.map((o) => {
+                      const isExpanded = expandedId === o.id;
+                      return (
+                        <>
+                          <TableRow
+                            key={o.id}
+                            className={cn("cursor-pointer hover:bg-muted/50", isExpanded && "bg-muted/30")}
+                            onClick={() => handleToggleExpand(o)}
                           >
-                            {o.status === "completed" ? "Selesai" : o.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <div className="flex justify-center gap-1">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleViewDetail(o)}
-                              title="Lihat Detail"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handlePrint(o)}
-                              title="Cetak Struk"
-                            >
-                              <Printer className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                            <TableCell className="w-8 px-2">
+                              {isExpanded ? (
+                                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </TableCell>
+                            <TableCell className="font-mono text-xs font-semibold text-card-foreground">
+                              {o.order_number}
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground">
+                              {formatDate(o.created_at)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className="text-xs">
+                                {methodLabel[o.payment_method] ?? o.payment_method}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right font-mono font-semibold text-card-foreground">
+                              {formatRupiah(o.total)}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                className={
+                                  o.status === "completed"
+                                    ? "bg-accent text-accent-foreground"
+                                    : "bg-muted text-muted-foreground"
+                                }
+                              >
+                                {o.status === "completed" ? "Selesai" : o.status}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handlePrint(o);
+                                }}
+                                title="Cetak Struk"
+                              >
+                                <Printer className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+
+                          {/* Expanded detail panel */}
+                          {isExpanded && (
+                            <TableRow key={`${o.id}-detail`}>
+                              <TableCell colSpan={7} className="p-0 border-b border-border">
+                                <div className="bg-muted/20 px-6 py-4 space-y-3">
+                                  {loadingExpand ? (
+                                    <div className="flex justify-center py-4">
+                                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                                    </div>
+                                  ) : (
+                                    <>
+                                      {/* Detail info */}
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                                        <div>
+                                          <p className="text-xs text-muted-foreground">No. Order</p>
+                                          <p className="font-mono font-semibold text-card-foreground">{o.order_number}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-muted-foreground">Tanggal</p>
+                                          <p className="font-medium text-card-foreground">{formatDate(o.created_at)}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-muted-foreground">Metode Bayar</p>
+                                          <p className="font-medium text-card-foreground">
+                                            {methodLabel[o.payment_method] ?? o.payment_method}
+                                          </p>
+                                        </div>
+                                        <div>
+                                          <p className="text-xs text-muted-foreground">Status</p>
+                                          <Badge
+                                            variant="outline"
+                                            className={
+                                              o.status === "completed"
+                                                ? "bg-accent/20 text-accent-foreground border-accent"
+                                                : ""
+                                            }
+                                          >
+                                            {o.status === "completed" ? "Selesai" : o.status}
+                                          </Badge>
+                                        </div>
+                                      </div>
+
+                                      {/* Items table */}
+                                      <div className="rounded-md border border-border overflow-hidden">
+                                        <Table>
+                                          <TableHeader>
+                                            <TableRow className="bg-muted/50">
+                                              <TableHead className="text-xs">Produk</TableHead>
+                                              <TableHead className="text-xs text-center">Qty</TableHead>
+                                              <TableHead className="text-xs text-right">Harga</TableHead>
+                                              <TableHead className="text-xs text-right">Subtotal</TableHead>
+                                            </TableRow>
+                                          </TableHeader>
+                                          <TableBody>
+                                            {expandedItems.map((item) => (
+                                              <TableRow key={item.id}>
+                                                <TableCell className="text-sm font-medium text-card-foreground">
+                                                  {item.product_name}
+                                                </TableCell>
+                                                <TableCell className="text-center text-sm">{item.quantity}</TableCell>
+                                                <TableCell className="text-right font-mono text-sm">
+                                                  {formatRupiah(item.unit_price)}
+                                                </TableCell>
+                                                <TableCell className="text-right font-mono text-sm font-semibold">
+                                                  {formatRupiah(item.subtotal)}
+                                                </TableCell>
+                                              </TableRow>
+                                            ))}
+                                          </TableBody>
+                                        </Table>
+                                      </div>
+
+                                      {/* Summary */}
+                                      <div className="flex justify-end">
+                                        <div className="w-full max-w-xs space-y-1 text-sm">
+                                          <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Subtotal</span>
+                                            <span className="font-mono">{formatRupiah(o.subtotal)}</span>
+                                          </div>
+                                          {o.discount > 0 && (
+                                            <div className="flex justify-between">
+                                              <span className="text-muted-foreground">Diskon</span>
+                                              <span className="font-mono">-{formatRupiah(o.discount)}</span>
+                                            </div>
+                                          )}
+                                          <div className="flex justify-between">
+                                            <span className="text-muted-foreground">Pajak</span>
+                                            <span className="font-mono">{formatRupiah(o.tax)}</span>
+                                          </div>
+                                          <div className="flex justify-between border-t border-border pt-2 font-bold">
+                                            <span>Total</span>
+                                            <span className="font-mono">{formatRupiah(o.total)}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      {/* Print button */}
+                                      <div className="flex justify-end">
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="gap-1.5"
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handlePrint(o);
+                                          }}
+                                        >
+                                          <Printer className="h-3.5 w-3.5" /> Cetak Struk
+                                        </Button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </>
+                      );
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -329,98 +430,6 @@ export default function TransactionHistory() {
           </CardContent>
         </Card>
       </div>
-
-      {/* Detail Dialog */}
-      <Dialog open={!!detailOrder} onOpenChange={() => setDetailOrder(null)}>
-        <DialogContent className="sm:max-w-2xl bg-card border-border">
-          <DialogHeader>
-            <DialogTitle className="text-card-foreground">
-              Detail Transaksi — {detailOrder?.order_number}
-            </DialogTitle>
-          </DialogHeader>
-
-          {loadingDetail ? (
-            <div className="flex justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-xs text-muted-foreground">Tanggal</p>
-                  <p className="font-medium text-card-foreground">
-                    {detailOrder ? formatDate(detailOrder.created_at) : ""}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Metode</p>
-                  <p className="font-medium text-card-foreground">
-                    {detailOrder
-                      ? methodLabel[detailOrder.payment_method] ?? detailOrder.payment_method
-                      : ""}
-                  </p>
-                </div>
-              </div>
-
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Produk</TableHead>
-                    <TableHead className="text-center">Qty</TableHead>
-                    <TableHead className="text-right">Harga</TableHead>
-                    <TableHead className="text-right">Subtotal</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {detailItems.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="text-sm font-medium text-card-foreground">
-                        {item.product_name}
-                      </TableCell>
-                      <TableCell className="text-center text-sm">
-                        {item.quantity}
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm">
-                        {formatRupiah(item.unit_price)}
-                      </TableCell>
-                      <TableCell className="text-right font-mono text-sm font-semibold">
-                        {formatRupiah(item.subtotal)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              {detailOrder && (
-                <div className="space-y-1 rounded-lg bg-muted p-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Subtotal</span>
-                    <span className="font-mono">{formatRupiah(detailOrder.subtotal)}</span>
-                  </div>
-                  {detailOrder.discount > 0 && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Diskon</span>
-                      <span className="font-mono">-{formatRupiah(detailOrder.discount)}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Pajak</span>
-                    <span className="font-mono">{formatRupiah(detailOrder.tax)}</span>
-                  </div>
-                  <div className="flex justify-between border-t border-border pt-2 font-bold">
-                    <span>Total</span>
-                    <span className="font-mono">{formatRupiah(detailOrder.total)}</span>
-                  </div>
-                </div>
-              )}
-
-              <Button onClick={handlePrintFromDetail} className="w-full gap-2">
-                <Printer className="h-4 w-4" /> Cetak Struk
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </AppLayout>
   );
 }
