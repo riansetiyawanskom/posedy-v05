@@ -39,7 +39,7 @@ export default function ActivityLogs() {
   const [dateTo, setDateTo] = useState("");
 
   const { data: logs = [], isLoading } = useActivityLogs({
-    module: moduleFilter || undefined,
+    module: moduleFilter === "all" ? undefined : moduleFilter || undefined,
     dateFrom: dateFrom || undefined,
     dateTo: dateTo || undefined,
   });
