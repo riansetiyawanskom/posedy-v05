@@ -15,6 +15,7 @@ import UserManagement from "./pages/UserManagement.tsx";
 import ProductManagement from "./pages/ProductManagement.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Reports from "./pages/Reports.tsx";
+import ActivityLogs from "./pages/ActivityLogs.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -29,71 +30,18 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/purchasing"
-              element={
-                <ProtectedRoute>
-                  <Purchasing />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/stock-opname"
-              element={
-                <ProtectedRoute>
-                  <StockOpname />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/transactions"
-              element={
-                <ProtectedRoute>
-                  <TransactionHistory />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/user-management"
-              element={
-                <ProtectedRoute>
-                  <UserManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/product-management"
-              element={
-                <ProtectedRoute>
-                  <ProductManagement />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute>
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            {/* Kasir + Admin */}
+            <Route path="/" element={<ProtectedRoute allowedRoles={["admin", "kasir"]}><Index /></ProtectedRoute>} />
+            <Route path="/stock-opname" element={<ProtectedRoute allowedRoles={["admin", "kasir"]}><StockOpname /></ProtectedRoute>} />
+            <Route path="/transactions" element={<ProtectedRoute allowedRoles={["admin", "kasir"]}><TransactionHistory /></ProtectedRoute>} />
+            {/* Admin only */}
+            <Route path="/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><Dashboard /></ProtectedRoute>} />
+            <Route path="/product-management" element={<ProtectedRoute allowedRoles={["admin"]}><ProductManagement /></ProtectedRoute>} />
+            <Route path="/purchasing" element={<ProtectedRoute allowedRoles={["admin"]}><Purchasing /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute allowedRoles={["admin"]}><Reports /></ProtectedRoute>} />
+            <Route path="/user-management" element={<ProtectedRoute allowedRoles={["admin"]}><UserManagement /></ProtectedRoute>} />
+            <Route path="/activity-logs" element={<ProtectedRoute allowedRoles={["admin"]}><ActivityLogs /></ProtectedRoute>} />
+            {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

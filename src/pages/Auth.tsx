@@ -34,6 +34,20 @@ export default function Auth() {
     return <Navigate to="/" replace />;
   }
 
+  const logLogin = async (userEmail: string) => {
+    // Fire-and-forget login log
+    const { data: { user: u } } = await supabase.auth.getUser();
+    if (u) {
+      supabase.from("activity_logs").insert({
+        user_id: u.id,
+        user_email: userEmail,
+        action: "login",
+        module: "auth",
+        description: `Login sebagai ${userEmail}`,
+      }).then(() => {});
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -41,6 +55,8 @@ export default function Auth() {
     setSubmitting(false);
     if (error) {
       toast.error(error.message);
+    } else {
+      logLogin(email);
     }
   };
 
@@ -50,6 +66,8 @@ export default function Auth() {
     setSubmitting(false);
     if (error) {
       toast.error(error.message);
+    } else {
+      logLogin(demoEmail);
     }
   };
 

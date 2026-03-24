@@ -8,10 +8,12 @@ import {
   LogOut,
   History,
   FileText,
+  ScrollText,
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import {
   Sidebar,
   SidebarContent,
@@ -25,16 +27,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-const navItems = [
-  { title: "POS Kasir", url: "/", icon: Store },
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Produk", url: "/product-management", icon: Package },
-  { title: "Pembelian", url: "/purchasing", icon: Truck },
-  { title: "Stok Opname", url: "/stock-opname", icon: ClipboardCheck },
-  { title: "Riwayat", url: "/transactions", icon: History },
-  { title: "Laporan", url: "/reports", icon: FileText },
-  { title: "User", url: "/user-management", icon: Users },
+const allNavItems = [
+  { title: "POS Kasir", url: "/", icon: Store, roles: ["admin", "kasir"] },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
+  { title: "Produk", url: "/product-management", icon: Package, roles: ["admin"] },
+  { title: "Pembelian", url: "/purchasing", icon: Truck, roles: ["admin"] },
+  { title: "Stok Opname", url: "/stock-opname", icon: ClipboardCheck, roles: ["admin", "kasir"] },
+  { title: "Riwayat", url: "/transactions", icon: History, roles: ["admin", "kasir"] },
+  { title: "Laporan", url: "/reports", icon: FileText, roles: ["admin"] },
+  { title: "User", url: "/user-management", icon: Users, roles: ["admin"] },
+  { title: "Log Aktivitas", url: "/activity-logs", icon: ScrollText, roles: ["admin"] },
 ];
 
 export function AppSidebar() {
@@ -42,6 +46,12 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { roles, isAdmin } = useUserRole();
+
+  // Filter nav items based on role; if no roles assigned, show all (fallback)
+  const navItems = roles.length > 0
+    ? allNavItems.filter((item) => isAdmin || item.roles.some((r) => roles.includes(r)))
+    : allNavItems;
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
@@ -91,7 +101,16 @@ export function AppSidebar() {
 
       <SidebarFooter className="border-t border-border p-3">
         {!collapsed && (
-          <p className="mb-2 truncate text-xs text-muted-foreground">{user?.email}</p>
+          <div className="mb-2 space-y-1">
+            <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
+            <div className="flex gap-1">
+              {roles.map((r) => (
+                <Badge key={r} variant={r === "admin" ? "default" : "secondary"} className="text-[10px] px-1.5 py-0">
+                  {r}
+                </Badge>
+              ))}
+            </div>
+          </div>
         )}
         <Button
           variant="ghost"
