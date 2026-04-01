@@ -137,6 +137,25 @@ export default function TransactionHistory() {
     setDateTo(undefined);
   };
 
+  const handleResetData = async () => {
+    setResetting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("reset-transaction-data", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (res.error) throw res.error;
+      toast.success("Data transaksi berhasil direset");
+      setExpandedId(null);
+      setExpandedItems([]);
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || "Gagal mereset data");
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("id-ID", {
       day: "2-digit",
