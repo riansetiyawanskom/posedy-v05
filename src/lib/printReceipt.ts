@@ -83,9 +83,9 @@ export function printOrderReceipt(data: ReceiptOrderData) {
 <body>
   <div class="receipt">
     <div class="center" style="margin-bottom:8px">
-      <p style="font-size:16px;font-weight:bold;margin:0">POS SYSTEM</p>
-      <p style="font-size:10px;margin:2px 0">Jl. Contoh No. 123, Jakarta</p>
-      <p style="font-size:10px;margin:2px 0">Telp: (021) 1234-5678</p>
+      <p style="font-size:16px;font-weight:bold;margin:0">${data.storeName || "POS SYSTEM"}</p>
+      ${data.storeAddress ? `<p style="font-size:10px;margin:2px 0">${data.storeAddress}</p>` : ""}
+      ${data.storePhone ? `<p style="font-size:10px;margin:2px 0">Telp: ${data.storePhone}</p>` : ""}
     </div>
     <div class="sep"></div>
     <div style="font-size:11px">
