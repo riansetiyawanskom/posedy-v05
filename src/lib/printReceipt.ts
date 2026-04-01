@@ -38,6 +38,9 @@ export interface ReceiptOrderData {
   discount: number;
   tax: number;
   total: number;
+  storeName?: string;
+  storePhone?: string;
+  storeAddress?: string;
 }
 
 export function printOrderReceipt(data: ReceiptOrderData) {
