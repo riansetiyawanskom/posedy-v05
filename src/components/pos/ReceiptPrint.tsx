@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { formatRupiah } from "@/lib/format";
 import type { Cart } from "@/types/pos";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface ReceiptData {
   orderNumber: string;
@@ -14,12 +15,17 @@ interface ReceiptData {
 
 export const ReceiptPrint = forwardRef<HTMLDivElement, { data: ReceiptData }>(
   ({ data }, ref) => {
+    const { settings } = useStoreSettings();
     const methodLabel =
       data.paymentMethod === "cash"
         ? "Tunai"
         : data.paymentMethod === "card"
         ? "Kartu"
         : "E-Wallet";
+
+    const storeName = settings?.store_name || "POS System";
+    const storeAddress = settings?.address || "";
+    const storePhone = settings?.phone || "";
 
     return (
       <div
@@ -36,14 +42,14 @@ export const ReceiptPrint = forwardRef<HTMLDivElement, { data: ReceiptData }>(
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "8px" }}>
           <p style={{ fontSize: "16px", fontWeight: "bold", margin: 0 }}>
-            POS SYSTEM
+            {storeName}
           </p>
-          <p style={{ fontSize: "10px", margin: "2px 0" }}>
-            Jl. Contoh No. 123, Jakarta
-          </p>
-          <p style={{ fontSize: "10px", margin: "2px 0" }}>
-            Telp: (021) 1234-5678
-          </p>
+          {storeAddress && (
+            <p style={{ fontSize: "10px", margin: "2px 0" }}>{storeAddress}</p>
+          )}
+          {storePhone && (
+            <p style={{ fontSize: "10px", margin: "2px 0" }}>Telp: {storePhone}</p>
+          )}
         </div>
 
         <div style={{ borderTop: "1px dashed #000", margin: "6px 0" }} />

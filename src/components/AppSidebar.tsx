@@ -9,11 +9,13 @@ import {
   History,
   FileText,
   ScrollText,
+  Settings,
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 import {
   Sidebar,
   SidebarContent,
@@ -39,6 +41,7 @@ const allNavItems = [
   { title: "Laporan", url: "/reports", icon: FileText, roles: ["admin"] },
   { title: "User", url: "/user-management", icon: Users, roles: ["admin"] },
   { title: "Log Aktivitas", url: "/activity-logs", icon: ScrollText, roles: ["admin"] },
+  { title: "Pengaturan", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
 
 export function AppSidebar() {
@@ -47,6 +50,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { roles, isAdmin } = useUserRole();
+  const { settings } = useStoreSettings();
 
   // Filter nav items based on role; if no roles assigned, show all (fallback)
   const navItems = roles.length > 0
@@ -63,7 +67,7 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <span className="text-sm font-extrabold tracking-tight text-card-foreground">
-              POS System
+              {settings?.store_name || "POS System"}
             </span>
           )}
         </div>

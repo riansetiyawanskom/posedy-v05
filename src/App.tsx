@@ -16,6 +16,7 @@ import ProductManagement from "./pages/ProductManagement.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Reports from "./pages/Reports.tsx";
 import ActivityLogs from "./pages/ActivityLogs.tsx";
+import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/reports" element={<ProtectedRoute allowedRoles={["admin"]}><Reports /></ProtectedRoute>} />
             <Route path="/user-management" element={<ProtectedRoute allowedRoles={["admin"]}><UserManagement /></ProtectedRoute>} />
             <Route path="/activity-logs" element={<ProtectedRoute allowedRoles={["admin"]}><ActivityLogs /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute allowedRoles={["admin"]}><Settings /></ProtectedRoute>} />
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
           </Routes>

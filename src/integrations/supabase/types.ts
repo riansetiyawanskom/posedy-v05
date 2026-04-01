@@ -494,6 +494,33 @@ export type Database = {
           },
         ]
       }
+      store_settings: {
+        Row: {
+          address: string | null
+          id: string
+          phone: string | null
+          store_name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          address?: string | null
+          id?: string
+          phone?: string | null
+          store_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          address?: string | null
+          id?: string
+          phone?: string | null
+          store_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       suppliers: {
         Row: {
           address: string | null

@@ -17,6 +17,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { cn } from "@/lib/utils";
 
 const methodLabel: Record<string, string> = {
@@ -28,6 +29,7 @@ const methodLabel: Record<string, string> = {
 export default function TransactionHistory() {
   const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
   const { isAdmin } = useUserRole();
+  const { settings: storeSettings } = useStoreSettings();
   const [search, setSearch] = useState("");
   const [resetting, setResetting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -94,6 +96,9 @@ export default function TransactionHistory() {
       discount: order.discount,
       tax: order.tax,
       total: order.total,
+      storeName: storeSettings?.store_name,
+      storePhone: storeSettings?.phone,
+      storeAddress: storeSettings?.address,
     });
   };
 
