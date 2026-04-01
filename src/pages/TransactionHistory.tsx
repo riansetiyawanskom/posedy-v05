@@ -17,6 +17,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { cn } from "@/lib/utils";
 
 const methodLabel: Record<string, string> = {
