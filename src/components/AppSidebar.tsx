@@ -40,6 +40,7 @@ const allNavItems = [
   { title: "Laporan", url: "/reports", icon: FileText, roles: ["admin"] },
   { title: "User", url: "/user-management", icon: Users, roles: ["admin"] },
   { title: "Log Aktivitas", url: "/activity-logs", icon: ScrollText, roles: ["admin"] },
+  { title: "Pengaturan", url: "/settings", icon: Settings, roles: ["admin"] },
 ];
 
 export function AppSidebar() {
