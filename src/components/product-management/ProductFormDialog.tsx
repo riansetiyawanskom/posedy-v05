@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useCreateProduct, useUpdateProduct, type ProductFormData } from "@/hooks/useProductManagement";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -8,8 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "./ImageUpload";
 import { BarcodeDisplay } from "./BarcodeDisplay";
-import { generateSKU } from "@/lib/generateSKU";
-import { RefreshCw } from "lucide-react";
+import { ScanBarcode, Keyboard } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   open: boolean;

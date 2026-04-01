@@ -239,6 +239,29 @@ export default function TransactionHistory() {
             >
               <Download className="h-3.5 w-3.5" /> Export CSV
             </Button>
+            {isAdmin && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="gap-1.5" disabled={resetting || orders.length === 0}>
+                    <Trash2 className="h-3.5 w-3.5" /> Reset Data
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset Data Transaksi?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Semua data transaksi (orders & order items) akan dihapus permanen. Data laporan penjualan dan rugi laba juga akan terpengaruh. Tindakan ini tidak dapat dibatalkan.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetData} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      {resetting ? "Mereset..." : "Ya, Reset Semua"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </div>
 
