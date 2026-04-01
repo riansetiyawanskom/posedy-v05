@@ -50,6 +50,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { roles, isAdmin } = useUserRole();
+  const { settings } = useStoreSettings();
 
   // Filter nav items based on role; if no roles assigned, show all (fallback)
   const navItems = roles.length > 0
