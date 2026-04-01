@@ -12,7 +12,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDown, ChevronRight } from "lucide-react";
+import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useUserRole } from "@/hooks/useUserRole";
 import { cn } from "@/lib/utils";
 
 const methodLabel: Record<string, string> = {
@@ -22,8 +26,10 @@ const methodLabel: Record<string, string> = {
 };
 
 export default function TransactionHistory() {
-  const { orders, isLoading, fetchOrderItems } = useTransactionHistory();
+  const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
+  const { isAdmin } = useUserRole();
   const [search, setSearch] = useState("");
+  const [resetting, setResetting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<OrderItemRow[]>([]);
   const [loadingExpand, setLoadingExpand] = useState(false);
@@ -131,6 +137,25 @@ export default function TransactionHistory() {
     setDateTo(undefined);
   };
 
+  const handleResetData = async () => {
+    setResetting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke("reset-transaction-data", {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (res.error) throw res.error;
+      toast.success("Data transaksi berhasil direset");
+      setExpandedId(null);
+      setExpandedItems([]);
+      refetch();
+    } catch (err: any) {
+      toast.error(err.message || "Gagal mereset data");
+    } finally {
+      setResetting(false);
+    }
+  };
+
   const formatDate = (iso: string) =>
     new Date(iso).toLocaleString("id-ID", {
       day: "2-digit",
@@ -214,6 +239,29 @@ export default function TransactionHistory() {
             >
               <Download className="h-3.5 w-3.5" /> Export CSV
             </Button>
+            {isAdmin && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="sm" className="gap-1.5" disabled={resetting || orders.length === 0}>
+                    <Trash2 className="h-3.5 w-3.5" /> Reset Data
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset Data Transaksi?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Semua data transaksi (orders & order items) akan dihapus permanen. Data laporan penjualan dan rugi laba juga akan terpengaruh. Tindakan ini tidak dapat dibatalkan.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetData} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      {resetting ? "Mereset..." : "Ya, Reset Semua"}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           </div>
         </div>
 
