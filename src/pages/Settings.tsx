@@ -37,7 +37,7 @@ export default function Settings() {
   }
 
   return (
-    <AppLayout>
+    <AppLayout title="Pengaturan">
       <div className="space-y-6 max-w-2xl">
         <div>
           <h1 className="text-2xl font-bold text-card-foreground">Pengaturan</h1>
