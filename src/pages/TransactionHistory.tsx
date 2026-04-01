@@ -96,6 +96,9 @@ export default function TransactionHistory() {
       discount: order.discount,
       tax: order.tax,
       total: order.total,
+      storeName: storeSettings?.store_name,
+      storePhone: storeSettings?.phone,
+      storeAddress: storeSettings?.address,
     });
   };
 
