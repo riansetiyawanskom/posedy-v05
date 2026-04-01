@@ -33,6 +33,10 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const [form, setForm] = useState<ProductFormData>(empty);
+  const [scannerMode, setScannerMode] = useState(false);
+  const skuInputRef = useRef<HTMLInputElement>(null);
+  const scanBuffer = useRef("");
+  const scanTimeout = useRef<ReturnType<typeof setTimeout>>();
 
   const isEdit = !!product;
 
@@ -49,9 +53,47 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
         is_active: product.is_active ?? true,
       });
     } else {
-      setForm({ ...empty, sku: generateSKU() });
+      setForm({ ...empty });
     }
+    setScannerMode(false);
   }, [product, open]);
+
+  // Scanner listener when scannerMode is active
+  const handleScannerKey = useCallback(
+    (e: KeyboardEvent) => {
+      if (!scannerMode || !open) return;
+      // Ignore if user is typing in other inputs
+      const target = e.target as HTMLElement;
+      const isSkuInput = target === skuInputRef.current;
+      if (!isSkuInput && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
+
+      if (e.key === "Enter" && scanBuffer.current.length >= 3) {
+        e.preventDefault();
+        const scanned = scanBuffer.current.trim();
+        scanBuffer.current = "";
+        setForm((f) => ({ ...f, sku: scanned }));
+        toast.success(`Barcode "${scanned}" berhasil di-scan`);
+        setScannerMode(false);
+        return;
+      }
+
+      if (e.key.length === 1) {
+        scanBuffer.current += e.key;
+        clearTimeout(scanTimeout.current);
+        scanTimeout.current = setTimeout(() => {
+          scanBuffer.current = "";
+        }, 150);
+      }
+    },
+    [scannerMode, open]
+  );
+
+  useEffect(() => {
+    if (scannerMode) {
+      window.addEventListener("keydown", handleScannerKey);
+      return () => window.removeEventListener("keydown", handleScannerKey);
+    }
+  }, [scannerMode, handleScannerKey]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,11 +123,35 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
             <div className="space-y-1.5">
               <Label htmlFor="sku">SKU / Barcode</Label>
               <div className="flex gap-1.5">
-                <Input id="sku" value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} maxLength={50} className="flex-1" />
-                <Button type="button" variant="outline" size="icon" title="Generate SKU baru" onClick={() => setForm((f) => ({ ...f, sku: generateSKU() }))}>
-                  <RefreshCw className="h-3.5 w-3.5" />
+                <Input
+                  id="sku"
+                  ref={skuInputRef}
+                  value={form.sku}
+                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                  maxLength={50}
+                  className="flex-1"
+                  placeholder={scannerMode ? "Arahkan scanner..." : "Ketik atau scan barcode"}
+                  readOnly={scannerMode}
+                />
+                <Button
+                  type="button"
+                  variant={scannerMode ? "default" : "outline"}
+                  size="icon"
+                  title={scannerMode ? "Mode scanner aktif — arahkan scanner barcode" : "Aktifkan mode scanner barcode"}
+                  onClick={() => {
+                    setScannerMode((v) => !v);
+                    scanBuffer.current = "";
+                    if (!scannerMode) {
+                      toast.info("Mode scanner aktif. Arahkan scanner barcode ke produk.");
+                    }
+                  }}
+                >
+                  {scannerMode ? <ScanBarcode className="h-3.5 w-3.5 animate-pulse" /> : <Keyboard className="h-3.5 w-3.5" />}
                 </Button>
               </div>
+              {scannerMode && (
+                <p className="text-xs text-primary animate-pulse">🔍 Menunggu input dari scanner barcode...</p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="category">Kategori</Label>
