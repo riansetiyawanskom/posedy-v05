@@ -9,6 +9,7 @@ import {
   History,
   FileText,
   ScrollText,
+  Settings,
 } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
