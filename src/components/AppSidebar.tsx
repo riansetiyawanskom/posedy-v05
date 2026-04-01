@@ -67,7 +67,7 @@ export function AppSidebar() {
           </div>
           {!collapsed && (
             <span className="text-sm font-extrabold tracking-tight text-card-foreground">
-              POS System
+              {settings?.store_name || "POS System"}
             </span>
           )}
         </div>
