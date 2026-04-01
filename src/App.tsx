@@ -16,6 +16,7 @@ import ProductManagement from "./pages/ProductManagement.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Reports from "./pages/Reports.tsx";
 import ActivityLogs from "./pages/ActivityLogs.tsx";
+import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
