@@ -29,6 +29,7 @@ const methodLabel: Record<string, string> = {
 export default function TransactionHistory() {
   const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
   const { isAdmin } = useUserRole();
+  const { settings: storeSettings } = useStoreSettings();
   const [search, setSearch] = useState("");
   const [resetting, setResetting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
