@@ -66,10 +66,9 @@ export function SalesReport() {
       (acc, o) => ({
         revenue: acc.revenue + Number(o.total),
         orders: acc.orders + 1,
-        tax: acc.tax + Number(o.tax),
         discount: acc.discount + Number(o.discount),
       }),
-      { revenue: 0, orders: 0, tax: 0, discount: 0 }
+      { revenue: 0, orders: 0, discount: 0 }
     );
   }, [filtered]);
 
