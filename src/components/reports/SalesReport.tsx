@@ -217,7 +217,6 @@ export function SalesReport() {
               <TableHead>No Order</TableHead>
               <TableHead>Metode</TableHead>
               <TableHead className="text-right">Subtotal</TableHead>
-              <TableHead className="text-right">Pajak</TableHead>
               <TableHead className="text-right">Diskon</TableHead>
               <TableHead className="text-right">Total</TableHead>
             </TableRow>
