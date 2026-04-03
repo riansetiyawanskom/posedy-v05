@@ -109,10 +109,6 @@ export const ReceiptPrint = forwardRef<HTMLDivElement, { data: ReceiptData }>(
               <span>-{formatRupiah(data.cart.discount)}</span>
             </div>
           )}
-          <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <span>Pajak (10%)</span>
-            <span>{formatRupiah(data.cart.tax)}</span>
-          </div>
           <div
             style={{
               display: "flex",

@@ -66,7 +66,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
         .insert({
           order_number: orderNumber,
           subtotal: cart.subtotal,
-          tax: cart.tax,
+          tax: 0,
           discount: cart.discount,
           total: cart.total,
           payment_method: method,
