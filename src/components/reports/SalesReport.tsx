@@ -266,7 +266,6 @@ function ExpandableOrderRow({
         <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
         <TableCell><Badge variant="outline" className="text-xs">{methodLabel[order.payment_method] ?? order.payment_method}</Badge></TableCell>
         <TableCell className="text-right text-sm">{formatRupiah(Number(order.subtotal))}</TableCell>
-        <TableCell className="text-right text-sm">{formatRupiah(Number(order.tax))}</TableCell>
         <TableCell className="text-right text-sm">{formatRupiah(Number(order.discount))}</TableCell>
         <TableCell className="text-right font-semibold text-sm">{formatRupiah(Number(order.total))}</TableCell>
       </TableRow>

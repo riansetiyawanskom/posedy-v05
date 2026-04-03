@@ -272,10 +272,6 @@ export function ProfitLossReport() {
                 <TableCell className="text-right font-bold">{formatRupiah(pnl.grossProfit)}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell className="text-muted-foreground pl-8">Pajak (PPN)</TableCell>
-                <TableCell className="text-right">{formatRupiah(pnl.tax)}</TableCell>
-              </TableRow>
-              <TableRow>
                 <TableCell className="text-muted-foreground pl-8">Diskon</TableCell>
                 <TableCell className="text-right text-destructive">-{formatRupiah(pnl.discount)}</TableCell>
               </TableRow>
