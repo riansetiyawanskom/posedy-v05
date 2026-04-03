@@ -104,7 +104,7 @@ export function SalesReport() {
 
   const handleExport = () => {
     const bom = "\uFEFF";
-    const header = "No,Tanggal,No Order,Metode,Subtotal,Pajak,Diskon,Total\n";
+    const header = "No,Tanggal,No Order,Metode,Subtotal,Diskon,Total\n";
     const rows = filtered.map((o, i) =>
       [
         i + 1,
@@ -112,7 +112,6 @@ export function SalesReport() {
         o.order_number,
         methodLabel[o.payment_method] ?? o.payment_method,
         o.subtotal,
-        o.tax,
         o.discount,
         o.total,
       ].join(",")
