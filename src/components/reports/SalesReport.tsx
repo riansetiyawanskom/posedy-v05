@@ -175,7 +175,6 @@ export function SalesReport() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Penjualan</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.revenue)}</p></CardContent></Card>
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Jumlah Order</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{totals.orders}</p></CardContent></Card>
-        <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Pajak</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.tax)}</p></CardContent></Card>
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Diskon</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.discount)}</p></CardContent></Card>
       </div>
 
