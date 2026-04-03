@@ -109,9 +109,9 @@ export function ProfitLossReport() {
     });
     const purchaseTotal = filteredPO.reduce((s, po) => s + Number(po.total), 0);
 
-    const netProfit = grossProfit - discount + tax;
+    const netProfit = grossProfit - discount;
 
-    return { revenue, cogs, grossProfit, tax, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length, filteredOrders, filteredPO };
+    return { revenue, cogs, grossProfit, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length, filteredOrders, filteredPO };
   }, [orders, orderItems, products, purchaseOrders, dateFrom, dateTo]);
 
   const comparisonData = useMemo(() => {
