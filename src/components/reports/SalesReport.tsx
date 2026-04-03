@@ -66,10 +66,9 @@ export function SalesReport() {
       (acc, o) => ({
         revenue: acc.revenue + Number(o.total),
         orders: acc.orders + 1,
-        tax: acc.tax + Number(o.tax),
         discount: acc.discount + Number(o.discount),
       }),
-      { revenue: 0, orders: 0, tax: 0, discount: 0 }
+      { revenue: 0, orders: 0, discount: 0 }
     );
   }, [filtered]);
 
@@ -105,7 +104,7 @@ export function SalesReport() {
 
   const handleExport = () => {
     const bom = "\uFEFF";
-    const header = "No,Tanggal,No Order,Metode,Subtotal,Pajak,Diskon,Total\n";
+    const header = "No,Tanggal,No Order,Metode,Subtotal,Diskon,Total\n";
     const rows = filtered.map((o, i) =>
       [
         i + 1,
@@ -113,7 +112,6 @@ export function SalesReport() {
         o.order_number,
         methodLabel[o.payment_method] ?? o.payment_method,
         o.subtotal,
-        o.tax,
         o.discount,
         o.total,
       ].join(",")
@@ -177,7 +175,6 @@ export function SalesReport() {
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Penjualan</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.revenue)}</p></CardContent></Card>
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Jumlah Order</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{totals.orders}</p></CardContent></Card>
-        <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Pajak</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.tax)}</p></CardContent></Card>
         <Card><CardHeader className="pb-1"><CardTitle className="text-xs text-muted-foreground">Total Diskon</CardTitle></CardHeader><CardContent><p className="text-lg font-bold">{formatRupiah(totals.discount)}</p></CardContent></Card>
       </div>
 
@@ -220,14 +217,13 @@ export function SalesReport() {
               <TableHead>No Order</TableHead>
               <TableHead>Metode</TableHead>
               <TableHead className="text-right">Subtotal</TableHead>
-              <TableHead className="text-right">Pajak</TableHead>
               <TableHead className="text-right">Diskon</TableHead>
               <TableHead className="text-right">Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 && (
-              <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Tidak ada data</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Tidak ada data</TableCell></TableRow>
             )}
             {filtered.map((o) => {
               const isExpanded = expandedRows.has(o.id);
@@ -270,7 +266,6 @@ function ExpandableOrderRow({
         <TableCell className="font-mono text-xs">{order.order_number}</TableCell>
         <TableCell><Badge variant="outline" className="text-xs">{methodLabel[order.payment_method] ?? order.payment_method}</Badge></TableCell>
         <TableCell className="text-right text-sm">{formatRupiah(Number(order.subtotal))}</TableCell>
-        <TableCell className="text-right text-sm">{formatRupiah(Number(order.tax))}</TableCell>
         <TableCell className="text-right text-sm">{formatRupiah(Number(order.discount))}</TableCell>
         <TableCell className="text-right font-semibold text-sm">{formatRupiah(Number(order.total))}</TableCell>
       </TableRow>

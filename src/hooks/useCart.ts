@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import type { Product, CartItem, Cart } from "@/types/pos";
 
-const TAX_RATE = 0.1; // 10%
+
 
 export function useCart() {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -49,9 +49,8 @@ export function useCart() {
       (sum, i) => sum + i.product.price * i.quantity,
       0
     );
-    const tax = (subtotal - discount) * TAX_RATE;
-    const total = subtotal - discount + tax;
-    return { items, subtotal, tax, discount, total: Math.max(total, 0) };
+    const total = subtotal - discount;
+    return { items, subtotal, tax: 0, discount, total: Math.max(total, 0) };
   }, [items, discount]);
 
   return { cart, addItem, removeItem, updateQuantity, clearCart, setDiscount };

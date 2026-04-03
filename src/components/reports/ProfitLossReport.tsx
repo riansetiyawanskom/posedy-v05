@@ -86,7 +86,6 @@ export function ProfitLossReport() {
     const orderIds = new Set(filteredOrders.map((o) => o.id));
 
     const revenue = filteredOrders.reduce((s, o) => s + Number(o.subtotal), 0);
-    const tax = filteredOrders.reduce((s, o) => s + Number(o.tax), 0);
     const discount = filteredOrders.reduce((s, o) => s + Number(o.discount), 0);
 
     // COGS from order items
@@ -110,9 +109,9 @@ export function ProfitLossReport() {
     });
     const purchaseTotal = filteredPO.reduce((s, po) => s + Number(po.total), 0);
 
-    const netProfit = grossProfit - discount + tax;
+    const netProfit = grossProfit - discount;
 
-    return { revenue, cogs, grossProfit, tax, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length, filteredOrders, filteredPO };
+    return { revenue, cogs, grossProfit, discount, purchaseTotal, netProfit, orderCount: filteredOrders.length, filteredOrders, filteredPO };
   }, [orders, orderItems, products, purchaseOrders, dateFrom, dateTo]);
 
   const comparisonData = useMemo(() => {
@@ -141,7 +140,6 @@ export function ProfitLossReport() {
       `Pendapatan Penjualan,${pnl.revenue}`,
       `Harga Pokok Penjualan (HPP),-${pnl.cogs}`,
       `Laba Kotor,${pnl.grossProfit}`,
-      `Pajak (PPN),${pnl.tax}`,
       `Diskon,-${pnl.discount}`,
       `Laba Bersih,${pnl.netProfit}`,
       ``,
@@ -272,10 +270,6 @@ export function ProfitLossReport() {
               <TableRow className="bg-muted/30">
                 <TableCell className="font-semibold">Laba Kotor</TableCell>
                 <TableCell className="text-right font-bold">{formatRupiah(pnl.grossProfit)}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="text-muted-foreground pl-8">Pajak (PPN)</TableCell>
-                <TableCell className="text-right">{formatRupiah(pnl.tax)}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="text-muted-foreground pl-8">Diskon</TableCell>

@@ -118,10 +118,6 @@ export function CartSidebar({
               <span className="font-mono">-{formatRupiah(cart.discount)}</span>
             </div>
           )}
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>Pajak (10%)</span>
-            <span className="font-mono">{formatRupiah(cart.tax)}</span>
-          </div>
           <div className="flex justify-between border-t border-border pt-2 text-base font-bold text-card-foreground">
             <span>Total</span>
             <span className="font-mono">{formatRupiah(cart.total)}</span>

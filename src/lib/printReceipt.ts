@@ -99,7 +99,7 @@ export function printOrderReceipt(data: ReceiptOrderData) {
     <div style="font-size:11px">
       <div class="row"><span>Subtotal</span><span>${fmtRp(data.subtotal)}</span></div>
       ${discountRow}
-      <div class="row"><span>Pajak</span><span>${fmtRp(data.tax)}</span></div>
+      
       <div style="display:flex;justify-content:space-between;font-weight:bold;font-size:14px;margin-top:4px">
         <span>TOTAL</span><span>${fmtRp(data.total)}</span>
       </div>
