@@ -140,7 +140,6 @@ export function ProfitLossReport() {
       `Pendapatan Penjualan,${pnl.revenue}`,
       `Harga Pokok Penjualan (HPP),-${pnl.cogs}`,
       `Laba Kotor,${pnl.grossProfit}`,
-      `Pajak (PPN),${pnl.tax}`,
       `Diskon,-${pnl.discount}`,
       `Laba Bersih,${pnl.netProfit}`,
       ``,
