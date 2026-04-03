@@ -86,7 +86,6 @@ export function ProfitLossReport() {
     const orderIds = new Set(filteredOrders.map((o) => o.id));
 
     const revenue = filteredOrders.reduce((s, o) => s + Number(o.subtotal), 0);
-    const tax = filteredOrders.reduce((s, o) => s + Number(o.tax), 0);
     const discount = filteredOrders.reduce((s, o) => s + Number(o.discount), 0);
 
     // COGS from order items
