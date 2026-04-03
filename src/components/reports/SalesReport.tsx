@@ -223,7 +223,7 @@ export function SalesReport() {
           </TableHeader>
           <TableBody>
             {filtered.length === 0 && (
-              <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Tidak ada data</TableCell></TableRow>
+              <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Tidak ada data</TableCell></TableRow>
             )}
             {filtered.map((o) => {
               const isExpanded = expandedRows.has(o.id);
