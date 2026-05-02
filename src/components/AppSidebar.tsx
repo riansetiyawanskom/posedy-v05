@@ -1,21 +1,11 @@
-import {
-  Store,
-  LayoutDashboard,
-  Truck,
-  ClipboardCheck,
-  Users,
-  Package,
-  LogOut,
-  History,
-  FileText,
-  ScrollText,
-  Settings,
-} from "lucide-react";
+import { Store, LogOut } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
+import { usePermissions } from "@/hooks/usePermissions";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
+import { MODULES } from "@/lib/modules";
 import {
   Sidebar,
   SidebarContent,
@@ -31,31 +21,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-const allNavItems = [
-  { title: "POS Kasir", url: "/", icon: Store, roles: ["admin", "kasir"] },
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, roles: ["admin"] },
-  { title: "Produk", url: "/product-management", icon: Package, roles: ["admin"] },
-  { title: "Pembelian", url: "/purchasing", icon: Truck, roles: ["admin"] },
-  { title: "Stok Opname", url: "/stock-opname", icon: ClipboardCheck, roles: ["admin", "kasir"] },
-  { title: "Riwayat", url: "/transactions", icon: History, roles: ["admin", "kasir"] },
-  { title: "Laporan", url: "/reports", icon: FileText, roles: ["admin"] },
-  { title: "User", url: "/user-management", icon: Users, roles: ["admin"] },
-  { title: "Log Aktivitas", url: "/activity-logs", icon: ScrollText, roles: ["admin"] },
-  { title: "Pengaturan", url: "/settings", icon: Settings, roles: ["admin"] },
-];
-
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { user, signOut } = useAuth();
-  const { roles, isAdmin } = useUserRole();
+  const { roles } = useUserRole();
+  const { hasPermission } = usePermissions();
   const { settings } = useStoreSettings();
 
-  // Filter nav items based on role; if no roles assigned, show all (fallback)
-  const navItems = roles.length > 0
-    ? allNavItems.filter((item) => isAdmin || item.roles.some((r) => roles.includes(r)))
-    : allNavItems;
+  // Menu items are filtered by DB-driven permissions (not hardcoded roles).
+  const navItems = MODULES.filter((m) => hasPermission(m.permission));
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
