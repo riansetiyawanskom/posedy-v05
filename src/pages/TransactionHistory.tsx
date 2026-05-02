@@ -16,7 +16,7 @@ import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDo
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useUserRole } from "@/hooks/useUserRole";
+import { usePermissions } from "@/hooks/usePermissions";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,8 @@ const methodLabel: Record<string, string> = {
 
 export default function TransactionHistory() {
   const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
-  const { isAdmin } = useUserRole();
+  const { hasPermission } = usePermissions();
+  const canResetTransactions = hasPermission("action:reset_transactions");
   const { settings: storeSettings } = useStoreSettings();
   const [search, setSearch] = useState("");
   const [resetting, setResetting] = useState(false);
@@ -244,7 +245,7 @@ export default function TransactionHistory() {
             >
               <Download className="h-3.5 w-3.5" /> Export CSV
             </Button>
-            {isAdmin && (
+            {canResetTransactions && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" size="sm" className="gap-1.5" disabled={resetting || orders.length === 0}>
