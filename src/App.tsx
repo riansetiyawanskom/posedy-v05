@@ -31,19 +31,19 @@ const App = () => (
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
-            {/* Kasir + Admin */}
-            <Route path="/" element={<ProtectedRoute allowedRoles={["admin", "kasir"]}><Index /></ProtectedRoute>} />
-            <Route path="/stock-opname" element={<ProtectedRoute allowedRoles={["admin", "kasir"]}><StockOpname /></ProtectedRoute>} />
-            <Route path="/transactions" element={<ProtectedRoute allowedRoles={["admin", "kasir"]}><TransactionHistory /></ProtectedRoute>} />
-            {/* Admin only */}
-            <Route path="/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><Dashboard /></ProtectedRoute>} />
-            <Route path="/product-management" element={<ProtectedRoute allowedRoles={["admin"]}><ProductManagement /></ProtectedRoute>} />
-            <Route path="/purchasing" element={<ProtectedRoute allowedRoles={["admin"]}><Purchasing /></ProtectedRoute>} />
-            <Route path="/reports" element={<ProtectedRoute allowedRoles={["admin"]}><Reports /></ProtectedRoute>} />
-            <Route path="/user-management" element={<ProtectedRoute allowedRoles={["admin"]}><UserManagement /></ProtectedRoute>} />
-            <Route path="/activity-logs" element={<ProtectedRoute allowedRoles={["admin"]}><ActivityLogs /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute allowedRoles={["admin"]}><Settings /></ProtectedRoute>} />
-            {/* Catch-all */}
+            {/* Access for each route is controlled by a permission slug stored in DB
+                (public.permissions + public.role_permissions). Admin manages who
+                can do what without code changes. */}
+            <Route path="/" element={<ProtectedRoute requiredPermission="module:pos"><Index /></ProtectedRoute>} />
+            <Route path="/stock-opname" element={<ProtectedRoute requiredPermission="module:stock_opname"><StockOpname /></ProtectedRoute>} />
+            <Route path="/transactions" element={<ProtectedRoute requiredPermission="module:transactions"><TransactionHistory /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute requiredPermission="module:dashboard"><Dashboard /></ProtectedRoute>} />
+            <Route path="/product-management" element={<ProtectedRoute requiredPermission="module:products"><ProductManagement /></ProtectedRoute>} />
+            <Route path="/purchasing" element={<ProtectedRoute requiredPermission="module:purchasing"><Purchasing /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute requiredPermission="module:reports"><Reports /></ProtectedRoute>} />
+            <Route path="/user-management" element={<ProtectedRoute requiredPermission="module:users"><UserManagement /></ProtectedRoute>} />
+            <Route path="/activity-logs" element={<ProtectedRoute requiredPermission="module:activity_logs"><ActivityLogs /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute requiredPermission="module:settings"><Settings /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
