@@ -56,7 +56,7 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
   const handleReceive = async (poId: string) => {
     try {
       await receiveMut.mutateAsync(poId);
-      toast.success("Barang diterima ✓ Stok toast.success("Barang diterima! Stok & HPP diperbarui.") HPP otomatis diperbarui");
+      toast.success("Barang diterima ✓ Stok & HPP otomatis diperbarui");
     } catch (err: any) {
       toast.error(friendlyError(err, "Penerimaan barang belum berhasil. Silakan coba lagi."));
     }
