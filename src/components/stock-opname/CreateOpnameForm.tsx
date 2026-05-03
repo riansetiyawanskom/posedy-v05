@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 interface Props {
   onCreated: (sessionId: string) => void;
@@ -37,10 +38,10 @@ export function CreateOpnameForm({ onCreated }: Props) {
         notes,
         created_by: user.id,
       });
-      toast.success("Sesi opname berhasil dibuat");
+      toast.success("Sesi opname dibuat ✓");
       onCreated(result.id);
     } catch {
-      toast.error("Gagal membuat sesi opname");
+      toast.error("Sesi opname belum bisa dibuat. Silakan coba lagi.");
     }
   };
 

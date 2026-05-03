@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Store, Loader2, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 type Mode = "login" | "register" | "forgot";
 
@@ -49,7 +50,7 @@ export default function Auth() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(friendlyError(error, "Tidak bisa masuk. Periksa email & kata sandi Anda."));
     } else {
       logLogin(email);
     }
@@ -68,9 +69,9 @@ export default function Auth() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(friendlyError(error, "Pendaftaran belum berhasil. Silakan coba lagi."));
     } else {
-      toast.success("Registrasi berhasil! Silakan cek email untuk verifikasi.");
+      toast.success("Pendaftaran berhasil! Cek email Anda untuk verifikasi.");
       setMode("login");
     }
   };
@@ -83,9 +84,9 @@ export default function Auth() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(friendlyError(error, "Tautan reset belum bisa dikirim. Coba lagi sebentar."));
     } else {
-      toast.success("Link reset password telah dikirim ke email Anda.");
+      toast.success("Tautan reset kata sandi sudah dikirim ke email Anda.");
       setMode("login");
     }
   };

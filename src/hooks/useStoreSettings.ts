@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 export interface StoreSettings {
   id: string;
@@ -29,7 +30,7 @@ export function useStoreSettings() {
 
   const updateMutation = useMutation({
     mutationFn: async (values: { store_name: string; phone: string; address: string }) => {
-      if (!settings?.id) throw new Error("No settings row found");
+      if (!settings?.id) throw new Error("Pengaturan toko belum tersedia. Coba muat ulang halaman.");
       const { error } = await supabase
         .from("store_settings")
         .update({ ...values, updated_at: new Date().toISOString() })
@@ -38,10 +39,10 @@ export function useStoreSettings() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["store-settings"] });
-      toast.success("Pengaturan toko berhasil disimpan");
+      toast.success("Pengaturan toko tersimpan ✓");
     },
-    onError: (err: any) => {
-      toast.error("Gagal menyimpan: " + (err?.message ?? "Unknown error"));
+    onError: (err) => {
+      toast.error(friendlyError(err, "Pengaturan toko belum bisa disimpan. Silakan coba lagi."));
     },
   });
 

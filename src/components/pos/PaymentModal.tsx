@@ -14,6 +14,7 @@ import { formatRupiah } from "@/lib/format";
 import type { Cart } from "@/types/pos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 import { ReceiptPrint } from "./ReceiptPrint";
 import { printReceiptElement } from "@/lib/printReceipt";
 
@@ -111,9 +112,9 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
       });
 
       setSuccess(true);
-      toast.success(`Pesanan ${orderNumber} berhasil!`);
-    } catch (err: any) {
-      toast.error("Gagal memproses pembayaran: " + (err?.message ?? "Unknown error"));
+      toast.success(`Pembayaran berhasil — pesanan ${orderNumber} ✓`);
+    } catch (err) {
+      toast.error(friendlyError(err, "Pembayaran belum bisa diproses. Silakan coba lagi."));
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 export interface Profile {
   id: string;
@@ -68,10 +69,10 @@ export function useUserManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user_roles"] });
-      toast({ title: "Role berhasil ditambahkan" });
+      toast({ title: "Role berhasil ditambahkan ✓" });
     },
     onError: (err: Error) => {
-      toast({ title: "Gagal menambahkan role", description: err.message, variant: "destructive" });
+      toast({ title: "Role belum bisa ditambahkan", description: friendlyError(err), variant: "destructive" });
     },
   });
 
@@ -86,10 +87,10 @@ export function useUserManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user_roles"] });
-      toast({ title: "Role berhasil dihapus" });
+      toast({ title: "Role berhasil dihapus ✓" });
     },
     onError: (err: Error) => {
-      toast({ title: "Gagal menghapus role", description: err.message, variant: "destructive" });
+      toast({ title: "Role belum bisa dihapus", description: friendlyError(err), variant: "destructive" });
     },
   });
 

@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 export function SupplierList() {
   const { data: suppliers, isLoading } = useSuppliers();
@@ -35,9 +36,9 @@ export function SupplierList() {
     });
     setSaving(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(friendlyError(error, "Supplier belum bisa ditambahkan."));
     } else {
-      toast.success("Supplier berhasil ditambahkan");
+      toast.success("Supplier baru ditambahkan ✓");
       qc.invalidateQueries({ queryKey: ["suppliers"] });
       setOpen(false);
       setName("");

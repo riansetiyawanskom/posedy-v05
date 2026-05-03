@@ -16,6 +16,7 @@ import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDo
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { cn } from "@/lib/utils";
@@ -151,12 +152,12 @@ export default function TransactionHistory() {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       if (res.error) throw res.error;
-      toast.success("Data transaksi berhasil direset");
+      toast.success("Data transaksi berhasil direset ✓");
       setExpandedId(null);
       setExpandedItems([]);
       refetch();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal mereset data");
+    } catch (err) {
+      toast.error(friendlyError(err, "Data transaksi belum bisa direset. Silakan coba lagi."));
     } finally {
       setResetting(false);
     }
