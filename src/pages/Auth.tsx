@@ -119,35 +119,6 @@ export default function Auth() {
           </p>
         </div>
 
-        {/* Demo Quick Login */}
-        {mode === "login" && (
-          <div className="space-y-2">
-            <p className="text-center text-xs font-medium text-muted-foreground">Quick Demo Login</p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map((demo) => (
-                <button
-                  key={demo.email}
-                  type="button"
-                  disabled={submitting}
-                  onClick={() => handleDemoLogin(demo.email, demo.password)}
-                  className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-card p-3 transition-all hover:border-accent hover:bg-accent/5 disabled:opacity-50"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
-                    <demo.icon className="h-4 w-4 text-accent" />
-                  </div>
-                  <span className="text-sm font-semibold text-card-foreground">{demo.label}</span>
-                  <span className="text-[10px] text-muted-foreground">{demo.description}</span>
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-3 py-1">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-[10px] text-muted-foreground">atau masuk manual</span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-          </div>
-        )}
-
         {/* Form */}
         <form
           onSubmit={
