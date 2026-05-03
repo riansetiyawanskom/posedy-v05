@@ -2,6 +2,7 @@ import { useRef, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, X, Loader2, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {

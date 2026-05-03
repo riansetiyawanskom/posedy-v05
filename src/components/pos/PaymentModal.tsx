@@ -14,6 +14,7 @@ import { formatRupiah } from "@/lib/format";
 import type { Cart } from "@/types/pos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 import { ReceiptPrint } from "./ReceiptPrint";
 import { printReceiptElement } from "@/lib/printReceipt";
 

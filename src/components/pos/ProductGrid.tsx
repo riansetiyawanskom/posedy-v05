@@ -7,6 +7,7 @@ import type { Product } from "@/types/pos";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 interface ProductGridProps {
   onAddToCart: (product: Product) => void;

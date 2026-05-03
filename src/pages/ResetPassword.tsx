@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Store, Loader2, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 export default function ResetPassword() {
   const navigate = useNavigate();

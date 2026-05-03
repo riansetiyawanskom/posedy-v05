@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Plus, Trash2, Loader2 } from "lucide-react";
 import { formatRupiah } from "@/lib/format";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 interface LineItem {
   product_id: string;

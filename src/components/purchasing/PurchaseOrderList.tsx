@@ -12,6 +12,7 @@ import { Plus, Loader2, CheckCircle2, ChevronDown, ChevronRight, Pencil, Trash2 
 import { formatRupiah } from "@/lib/format";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 import type { PurchaseOrder, PurchaseOrderItem } from "@/types/purchasing";
 
 const statusColors: Record<string, string> = {

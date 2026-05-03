@@ -16,6 +16,7 @@ import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDo
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import { cn } from "@/lib/utils";

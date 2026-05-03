@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 export function SupplierList() {
   const { data: suppliers, isLoading } = useSuppliers();
