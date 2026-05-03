@@ -19,7 +19,7 @@ export default function ResetPassword() {
     if (hash.includes("type=recovery")) {
       setReady(true);
     } else {
-      toast.error("Link reset password tidak valid.");
+      toast.error("Tautan reset kata sandi tidak valid atau sudah kedaluwarsa.");
       navigate("/auth", { replace: true });
     }
   }, [navigate]);
@@ -30,9 +30,9 @@ export default function ResetPassword() {
     const { error } = await supabase.auth.updateUser({ password });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(friendlyError(error, "Kata sandi belum bisa diubah. Silakan coba lagi."));
     } else {
-      toast.success("Password berhasil diubah!");
+      toast.success("Kata sandi berhasil diubah ✓");
       navigate("/", { replace: true });
     }
   };
