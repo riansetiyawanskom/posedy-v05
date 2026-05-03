@@ -104,13 +104,30 @@ export function useDeleteProduct() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      // Try hard delete first; if blocked by FK (product sudah dipakai di transaksi/PO/opname),
+      // fallback ke soft delete (nonaktifkan produk) agar histori tetap utuh.
       const { error } = await supabase.from("products").delete().eq("id", id);
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23503") {
+          const { error: softErr } = await supabase
+            .from("products")
+            .update({ is_active: false, updated_at: new Date().toISOString() })
+            .eq("id", id);
+          if (softErr) throw softErr;
+          return { soft: true };
+        }
+        throw error;
+      }
+      return { soft: false };
     },
-    onSuccess: () => {
+    onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["admin-products"] });
       qc.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Produk berhasil dihapus");
+      toast.success(
+        res?.soft
+          ? "Produk dinonaktifkan (sudah memiliki histori transaksi/PO/opname)"
+          : "Produk berhasil dihapus"
+      );
     },
     onError: (e: Error) => toast.error(e.message),
   });
