@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { friendlyError } from "@/lib/friendlyMessage";
 
 export interface ProductFormData {
   name: string;
@@ -66,9 +67,9 @@ export function useCreateProduct() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-products"] });
       qc.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Produk berhasil ditambahkan");
+      toast.success("Produk baru ditambahkan ✓");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e) => toast.error(friendlyError(e, "Operasi belum berhasil. Silakan coba lagi.")),
   });
 }
 
@@ -94,9 +95,9 @@ export function useUpdateProduct() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-products"] });
       qc.invalidateQueries({ queryKey: ["products"] });
-      toast.success("Produk berhasil diperbarui");
+      toast.success("Perubahan produk tersimpan ✓");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e) => toast.error(friendlyError(e, "Operasi belum berhasil. Silakan coba lagi.")),
   });
 }
 
@@ -125,11 +126,11 @@ export function useDeleteProduct() {
       qc.invalidateQueries({ queryKey: ["products"] });
       toast.success(
         res?.soft
-          ? "Produk dinonaktifkan (sudah memiliki histori transaksi/PO/opname)"
-          : "Produk berhasil dihapus"
+          ? "Produk dinonaktifkan karena masih punya riwayat transaksi/PO/opname. Histori tetap aman."
+          : "Produk dihapus ✓"
       );
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e) => toast.error(friendlyError(e, "Operasi belum berhasil. Silakan coba lagi.")),
   });
 }
 
@@ -147,9 +148,9 @@ export function useCreateCategory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Kategori berhasil ditambahkan");
+      toast.success("Kategori baru ditambahkan ✓");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e) => toast.error(friendlyError(e, "Operasi belum berhasil. Silakan coba lagi.")),
   });
 }
 
@@ -170,9 +171,9 @@ export function useUpdateCategory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Kategori berhasil diperbarui");
+      toast.success("Perubahan kategori tersimpan ✓");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e) => toast.error(friendlyError(e, "Operasi belum berhasil. Silakan coba lagi.")),
   });
 }
 
@@ -186,8 +187,8 @@ export function useDeleteCategory() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-categories"] });
       qc.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Kategori berhasil dihapus");
+      toast.success("Kategori dihapus ✓");
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e) => toast.error(friendlyError(e, "Operasi belum berhasil. Silakan coba lagi.")),
   });
 }
