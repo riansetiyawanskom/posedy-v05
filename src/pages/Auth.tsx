@@ -55,17 +55,6 @@ export default function Auth() {
     }
   };
 
-  const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
-    setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: demoEmail, password: demoPassword });
-    setSubmitting(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      logLogin(demoEmail);
-    }
-  };
-
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
