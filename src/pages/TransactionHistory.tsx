@@ -152,12 +152,12 @@ export default function TransactionHistory() {
         headers: { Authorization: `Bearer ${session?.access_token}` },
       });
       if (res.error) throw res.error;
-      toast.success("Data transaksi berhasil direset");
+      toast.success("Data transaksi berhasil direset ✓");
       setExpandedId(null);
       setExpandedItems([]);
       refetch();
-    } catch (err: any) {
-      toast.error(err.message || "Gagal mereset data");
+    } catch (err) {
+      toast.error(friendlyError(err, "Data transaksi belum bisa direset. Silakan coba lagi."));
     } finally {
       setResetting(false);
     }
