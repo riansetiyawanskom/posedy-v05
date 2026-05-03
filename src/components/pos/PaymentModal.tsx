@@ -112,9 +112,9 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
       });
 
       setSuccess(true);
-      toast.success(`Pesanan ${orderNumber} berhasil!`);
-    } catch (err: any) {
-      toast.error("Gagal memproses pembayaran: " + (err?.message ?? "Unknown error"));
+      toast.success(`Pembayaran berhasil — pesanan ${orderNumber} ✓`);
+    } catch (err) {
+      toast.error(friendlyError(err, "Pembayaran belum bisa diproses. Silakan coba lagi."));
     } finally {
       setLoading(false);
     }
