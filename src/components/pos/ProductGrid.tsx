@@ -42,12 +42,12 @@ export function ProductGrid({ onAddToCart }: ProductGridProps) {
         if (found) {
           if (found.stock > 0) {
             onAddToCart(found);
-            toast.success(`🛒 ${found.name} ditambahkan`);
+            toast.success(`${found.name} ditambahkan ke keranjang`);
           } else {
-            toast.error(`${found.name} — stok habis`);
+            toast.warning(`${found.name} — stok habis`);
           }
         } else {
-          toast.error(`Produk dengan barcode "${scanned}" tidak ditemukan`);
+          toast.error(`Produk dengan barcode "${scanned}" tidak ditemukan.`);
         }
         // Clear search if scanner typed into it
         if (isInputFocused) setSearch("");

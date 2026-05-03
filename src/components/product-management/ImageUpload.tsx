@@ -21,11 +21,11 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
 
   const uploadFile = useCallback(async (file: File) => {
     if (!ACCEPTED.includes(file.type)) {
-      toast.error("Format tidak didukung. Gunakan JPG, PNG, WebP, atau GIF");
+      toast.error("Format file tidak didukung. Gunakan JPG, PNG, WebP, atau GIF.");
       return;
     }
     if (file.size > MAX_SIZE) {
-      toast.error("Ukuran file maksimal 5MB");
+      toast.error("File terlalu besar. Maksimal 5 MB.");
       return;
     }
 
@@ -38,7 +38,7 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
       .upload(fileName, file, { upsert: true });
 
     if (error) {
-      toast.error("Gagal upload: " + error.message);
+      toast.error(friendlyError(error, "Gambar belum bisa diunggah. Silakan coba lagi."));
       setUploading(false);
       return;
     }
@@ -49,7 +49,7 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
 
     onChange(urlData.publicUrl);
     setUploading(false);
-    toast.success("Gambar berhasil diupload");
+    toast.success("Gambar berhasil diunggah ✓");
   }, [onChange]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

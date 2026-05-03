@@ -36,9 +36,9 @@ export function SupplierList() {
     });
     setSaving(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(friendlyError(error, "Supplier belum bisa ditambahkan."));
     } else {
-      toast.success("Supplier berhasil ditambahkan");
+      toast.success("Supplier baru ditambahkan ✓");
       qc.invalidateQueries({ queryKey: ["suppliers"] });
       setOpen(false);
       setName("");

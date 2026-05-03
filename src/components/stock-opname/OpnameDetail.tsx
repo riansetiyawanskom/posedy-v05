@@ -82,9 +82,9 @@ export function OpnameDetail({ sessionId }: Props) {
         })),
         adjusted_by: user.id,
       });
-      toast.success("Opname selesai! Stok telah disesuaikan.");
+      toast.success("Opname selesai ✓ Stok sudah disesuaikan");
     } catch {
-      toast.error("Gagal menyimpan hasil opname");
+      toast.error("Hasil opname belum bisa disimpan. Silakan coba lagi.");
     }
   };
 

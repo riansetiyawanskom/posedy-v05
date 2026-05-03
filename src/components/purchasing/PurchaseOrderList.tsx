@@ -56,9 +56,9 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
   const handleReceive = async (poId: string) => {
     try {
       await receiveMut.mutateAsync(poId);
-      toast.success("Barang diterima! Stok & HPP diperbarui.");
+      toast.success("Barang diterima ✓ Stok toast.success("Barang diterima! Stok & HPP diperbarui.") HPP otomatis diperbarui");
     } catch (err: any) {
-      toast.error(err?.message ?? "Gagal menerima barang");
+      toast.error(friendlyError(err, "Penerimaan barang belum berhasil. Silakan coba lagi."));
     }
   };
 
@@ -127,7 +127,7 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
 
   const handleSaveEdit = async () => {
     if (!editPO || !editSupplierId || editItems.length === 0) {
-      toast.error("Pilih supplier dan minimal 1 item");
+      toast.warning("Mohon pilih supplier dan tambahkan minimal 1 item.");
       return;
     }
     try {
@@ -142,10 +142,10 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
         const { [editPO.id]: _, ...rest } = prev;
         return rest;
       });
-      toast.success("PO berhasil diperbarui!");
+      toast.success("PO berhasil diperbarui ✓");
       setEditPO(null);
     } catch (err: any) {
-      toast.error(err?.message ?? "Gagal memperbarui PO");
+      toast.error(friendlyError(err, "PO belum bisa diperbarui. Silakan coba lagi."));
     }
   };
 
@@ -156,9 +156,9 @@ export function PurchaseOrderList({ onCreateNew }: Props) {
       // Clean up expanded & cache
       setExpandedRows((prev) => { const n = new Set(prev); n.delete(deletePOId); return n; });
       setItemsCache((prev) => { const { [deletePOId]: _, ...rest } = prev; return rest; });
-      toast.success("PO berhasil dihapus!");
+      toast.success("PO dihapus ✓");
     } catch (err: any) {
-      toast.error(err?.message ?? "Gagal menghapus PO");
+      toast.error(friendlyError(err, "PO belum bisa dihapus. Silakan coba lagi."));
     } finally {
       setDeletePOId(null);
     }

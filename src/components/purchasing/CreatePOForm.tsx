@@ -62,7 +62,7 @@ export function CreatePOForm({ onBack }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!supplierId || items.length === 0) {
-      toast.error("Pilih supplier dan tambahkan minimal 1 item");
+      toast.warning("Mohon pilih supplier dan tambahkan minimal 1 item.");
       return;
     }
 
@@ -97,11 +97,11 @@ export function CreatePOForm({ onBack }: Props) {
       const { error: itemsErr } = await supabase.from("purchase_order_items").insert(poItems);
       if (itemsErr) throw itemsErr;
 
-      toast.success(`PO ${poNumber} berhasil dibuat!`);
+      toast.success(`PO ${poNumber} berhasil dibuat ✓`);
       qc.invalidateQueries({ queryKey: ["purchase_orders"] });
       onBack();
     } catch (err: any) {
-      toast.error(err?.message ?? "Gagal membuat PO");
+      toast.error(friendlyError(err, "PO belum bisa dibuat. Silakan coba lagi."));
     } finally {
       setSaving(false);
     }
