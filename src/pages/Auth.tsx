@@ -4,15 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Store, Loader2, Mail, Lock, User, Shield, ShoppingCart } from "lucide-react";
+import { Store, Loader2, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "login" | "register" | "forgot";
-
-const DEMO_ACCOUNTS = [
-  { label: "Admin", email: "admin@demo.pos", password: "admin123", icon: Shield, description: "Akses penuh" },
-  { label: "Kasir", email: "kasir@demo.pos", password: "kasir123", icon: ShoppingCart, description: "Akses POS" },
-];
 
 export default function Auth() {
   const { user, loading } = useAuth();
@@ -57,17 +52,6 @@ export default function Auth() {
       toast.error(error.message);
     } else {
       logLogin(email);
-    }
-  };
-
-  const handleDemoLogin = async (demoEmail: string, demoPassword: string) => {
-    setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword({ email: demoEmail, password: demoPassword });
-    setSubmitting(false);
-    if (error) {
-      toast.error(error.message);
-    } else {
-      logLogin(demoEmail);
     }
   };
 
@@ -123,35 +107,6 @@ export default function Auth() {
             {mode === "forgot" && "Reset password Anda"}
           </p>
         </div>
-
-        {/* Demo Quick Login */}
-        {mode === "login" && (
-          <div className="space-y-2">
-            <p className="text-center text-xs font-medium text-muted-foreground">Quick Demo Login</p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map((demo) => (
-                <button
-                  key={demo.email}
-                  type="button"
-                  disabled={submitting}
-                  onClick={() => handleDemoLogin(demo.email, demo.password)}
-                  className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-card p-3 transition-all hover:border-accent hover:bg-accent/5 disabled:opacity-50"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
-                    <demo.icon className="h-4 w-4 text-accent" />
-                  </div>
-                  <span className="text-sm font-semibold text-card-foreground">{demo.label}</span>
-                  <span className="text-[10px] text-muted-foreground">{demo.description}</span>
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-3 py-1">
-              <div className="h-px flex-1 bg-border" />
-              <span className="text-[10px] text-muted-foreground">atau masuk manual</span>
-              <div className="h-px flex-1 bg-border" />
-            </div>
-          </div>
-        )}
 
         {/* Form */}
         <form
@@ -219,6 +174,13 @@ export default function Auth() {
             {mode === "register" && "Daftar"}
             {mode === "forgot" && "Kirim Link Reset"}
           </Button>
+
+          {mode === "login" && (
+            <div className="rounded-md border border-dashed border-border bg-muted/30 p-2.5 text-center text-[11px] text-muted-foreground space-y-0.5">
+              <p><span className="font-semibold text-foreground">Akses Admin:</span> admin@demo.pos / admin123</p>
+              <p><span className="font-semibold text-foreground">Akses Kasir:</span> kasir@demo.pos / kasir123</p>
+            </div>
+          )}
 
           {mode === "login" && (
             <button
