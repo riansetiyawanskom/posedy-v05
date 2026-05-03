@@ -4,15 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Store, Loader2, Mail, Lock, User, Shield, ShoppingCart } from "lucide-react";
+import { Store, Loader2, Mail, Lock, User } from "lucide-react";
 import { toast } from "sonner";
 
 type Mode = "login" | "register" | "forgot";
-
-const DEMO_ACCOUNTS = [
-  { label: "Admin", email: "admin@demo.pos", password: "admin123", icon: Shield, description: "Akses penuh" },
-  { label: "Kasir", email: "kasir@demo.pos", password: "kasir123", icon: ShoppingCart, description: "Akses POS" },
-];
 
 export default function Auth() {
   const { user, loading } = useAuth();
