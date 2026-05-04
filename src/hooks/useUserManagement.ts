@@ -21,6 +21,13 @@ export interface UserRole {
   role_id: string;
 }
 
+async function invokeManageUsers(payload: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke("manage-users", { body: payload });
+  if (error) throw error;
+  if ((data as any)?.error) throw new Error((data as any).error);
+  return data;
+}
+
 export function useUserManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -40,10 +47,7 @@ export function useUserManagement() {
   const rolesQuery = useQuery({
     queryKey: ["roles"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("roles")
-        .select("*")
-        .order("name");
+      const { data, error } = await supabase.from("roles").select("*").order("name");
       if (error) throw error;
       return data as Role[];
     },
@@ -52,9 +56,7 @@ export function useUserManagement() {
   const userRolesQuery = useQuery({
     queryKey: ["user_roles"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("*");
+      const { data, error } = await supabase.from("user_roles").select("*");
       if (error) throw error;
       return data as UserRole[];
     },
@@ -62,9 +64,7 @@ export function useUserManagement() {
 
   const assignRole = useMutation({
     mutationFn: async ({ userId, roleId }: { userId: string; roleId: string }) => {
-      const { error } = await supabase
-        .from("user_roles")
-        .insert({ user_id: userId, role_id: roleId });
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role_id: roleId });
       if (error) throw error;
     },
     onSuccess: () => {
@@ -94,6 +94,53 @@ export function useUserManagement() {
     },
   });
 
+  const createUser = useMutation({
+    mutationFn: async (input: { email: string; password: string; full_name?: string; role_id?: string }) => {
+      return invokeManageUsers({ action: "create", ...input });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["user_roles"] });
+      toast({ title: "User baru berhasil dibuat ✓" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Gagal membuat user", description: friendlyError(err), variant: "destructive" });
+    },
+  });
+
+  const deleteUser = useMutation({
+    mutationFn: async (user_id: string) => invokeManageUsers({ action: "delete", user_id }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profiles"] });
+      queryClient.invalidateQueries({ queryKey: ["user_roles"] });
+      toast({ title: "User berhasil dihapus ✓" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Gagal menghapus user", description: friendlyError(err), variant: "destructive" });
+    },
+  });
+
+  const resetUserPassword = useMutation({
+    mutationFn: async (email: string) => invokeManageUsers({ action: "reset_password", email }),
+    onSuccess: () => {
+      toast({ title: "Tautan reset terkirim ✓", description: "Cek email user untuk lanjutkan." });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Gagal mengirim reset", description: friendlyError(err), variant: "destructive" });
+    },
+  });
+
+  const setUserPassword = useMutation({
+    mutationFn: async (input: { user_id: string; password: string }) =>
+      invokeManageUsers({ action: "set_password", ...input }),
+    onSuccess: () => {
+      toast({ title: "Kata sandi diperbarui ✓" });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Gagal mengganti kata sandi", description: friendlyError(err), variant: "destructive" });
+    },
+  });
+
   return {
     profiles: profilesQuery.data ?? [],
     roles: rolesQuery.data ?? [],
@@ -101,5 +148,9 @@ export function useUserManagement() {
     isLoading: profilesQuery.isLoading || rolesQuery.isLoading || userRolesQuery.isLoading,
     assignRole,
     removeRole,
+    createUser,
+    deleteUser,
+    resetUserPassword,
+    setUserPassword,
   };
 }
