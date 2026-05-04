@@ -183,35 +183,16 @@ export default function Auth() {
             </div>
           )}
 
-          {mode === "login" && (
-            <button
-              type="button"
-              onClick={() => setMode("forgot")}
-              className="block w-full text-center text-xs text-muted-foreground hover:text-accent transition-colors"
-            >
-              Lupa password?
-            </button>
-          )}
         </form>
 
-        {/* Toggle mode */}
-        <p className="text-center text-sm text-muted-foreground">
-          {mode === "login" ? (
-            <>
-              Belum punya akun?{" "}
-              <button onClick={() => setMode("register")} className="font-semibold text-accent hover:underline">
-                Daftar
-              </button>
-            </>
-          ) : (
-            <>
-              Sudah punya akun?{" "}
-              <button onClick={() => setMode("login")} className="font-semibold text-accent hover:underline">
-                Masuk
-              </button>
-            </>
-          )}
-        </p>
+        {mode !== "login" && (
+          <p className="text-center text-sm text-muted-foreground">
+            Sudah punya akun?{" "}
+            <button onClick={() => setMode("login")} className="font-semibold text-accent hover:underline">
+              Masuk
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
