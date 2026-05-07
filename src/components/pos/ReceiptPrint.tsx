@@ -2,6 +2,7 @@ import { forwardRef } from "react";
 import { formatRupiah } from "@/lib/format";
 import type { Cart } from "@/types/pos";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
+import { getReceiptWidthPx, type ThermalPaperSize } from "@/lib/printReceipt";
 
 interface ReceiptData {
   orderNumber: string;
@@ -13,8 +14,14 @@ interface ReceiptData {
   change?: number;
 }
 
-export const ReceiptPrint = forwardRef<HTMLDivElement, { data: ReceiptData }>(
-  ({ data }, ref) => {
+interface ReceiptPrintProps {
+  data: ReceiptData;
+  paperSize?: ThermalPaperSize;
+  bottomGapMm?: number;
+}
+
+export const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
+  ({ data, paperSize = "80mm", bottomGapMm = 12 }, ref) => {
     const { settings } = useStoreSettings();
     const methodLabel =
       data.paymentMethod === "cash"
@@ -27,16 +34,19 @@ export const ReceiptPrint = forwardRef<HTMLDivElement, { data: ReceiptData }>(
     const storeAddress = settings?.address || "";
     const storePhone = settings?.phone || "";
 
+    const widthPx = getReceiptWidthPx(paperSize);
+
     return (
       <div
         ref={ref}
         className="receipt-thermal mx-auto bg-white text-black"
         style={{
-          width: "302px",
+          width: `${widthPx}px`,
           fontFamily: "'Courier New', Courier, monospace",
           fontSize: "12px",
           lineHeight: "1.4",
           padding: "12px 8px",
+          paddingBottom: `calc(12px + ${bottomGapMm}mm)`,
         }}
       >
         {/* Header */}
