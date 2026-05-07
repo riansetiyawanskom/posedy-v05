@@ -1,4 +1,24 @@
-export function printReceiptElement(element: HTMLElement) {
+export type ThermalPaperSize = "58mm" | "80mm";
+
+export interface PrintOptions {
+  paperSize?: ThermalPaperSize;
+  /** Extra blank space (in mm) appended after the receipt to create a gap before the next transaction. */
+  bottomGapMm?: number;
+}
+
+const PAPER_WIDTH_PX: Record<ThermalPaperSize, number> = {
+  "58mm": 219,
+  "80mm": 302,
+};
+
+export function getReceiptWidthPx(size: ThermalPaperSize): number {
+  return PAPER_WIDTH_PX[size];
+}
+
+export function printReceiptElement(element: HTMLElement, options: PrintOptions = {}) {
+  const paperSize: ThermalPaperSize = options.paperSize ?? "80mm";
+  const bottomGapMm = options.bottomGapMm ?? 12;
+
   const printWindow = window.open("", "_blank", "width=350,height=600");
   if (!printWindow) return;
 
@@ -9,12 +29,17 @@ export function printReceiptElement(element: HTMLElement) {
   <meta charset="utf-8" />
   <title>Struk Pembayaran</title>
   <style>
-    @page { size: 80mm auto; margin: 0; }
+    @page { size: ${paperSize} auto; margin: 0; }
     body { margin: 0; padding: 0; background: #fff; }
+    .receipt-wrap { page-break-after: always; }
+    .receipt-gap { height: ${bottomGapMm}mm; }
   </style>
 </head>
 <body>
-  ${element.innerHTML}
+  <div class="receipt-wrap">
+    ${element.innerHTML}
+    <div class="receipt-gap"></div>
+  </div>
   <script>
     window.onload = function() {
       window.print();
@@ -43,7 +68,11 @@ export interface ReceiptOrderData {
   storeAddress?: string;
 }
 
-export function printOrderReceipt(data: ReceiptOrderData) {
+export function printOrderReceipt(data: ReceiptOrderData, options: PrintOptions = {}) {
+  const paperSize: ThermalPaperSize = options.paperSize ?? "80mm";
+  const bottomGapMm = options.bottomGapMm ?? 12;
+  const widthPx = PAPER_WIDTH_PX[paperSize];
+
   const methodLabel =
     data.paymentMethod === "cash" ? "Tunai" : data.paymentMethod === "card" ? "Kartu" : "E-Wallet";
 
@@ -72,12 +101,13 @@ export function printOrderReceipt(data: ReceiptOrderData) {
   <meta charset="utf-8" />
   <title>Struk - ${data.orderNumber}</title>
   <style>
-    @page { size: 80mm auto; margin: 0; }
+    @page { size: ${paperSize} auto; margin: 0; }
     body { margin:0; padding:0; background:#fff; font-family:'Courier New',Courier,monospace; font-size:12px; line-height:1.4; }
-    .receipt { width:302px; margin:0 auto; padding:12px 8px; color:#000; }
+    .receipt { width:${widthPx}px; margin:0 auto; padding:12px 8px; color:#000; }
     .sep { border-top:1px dashed #000; margin:6px 0; }
     .row { display:flex; justify-content:space-between; font-size:11px; }
     .center { text-align:center; }
+    .receipt-gap { height:${bottomGapMm}mm; }
   </style>
 </head>
 <body>
@@ -111,6 +141,7 @@ export function printOrderReceipt(data: ReceiptOrderData) {
       <p style="margin:2px 0">tidak dapat dikembalikan.</p>
     </div>
   </div>
+  <div class="receipt-gap"></div>
   <script>
     window.onload = function() {
       window.print();
