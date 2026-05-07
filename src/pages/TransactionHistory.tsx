@@ -483,12 +483,18 @@ export default function TransactionHistory() {
                                           size="sm"
                                           variant="outline"
                                           className="gap-1.5"
+                                          disabled={previewLoading === o.id}
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handlePrint(o);
                                           }}
                                         >
-                                          <Printer className="h-3.5 w-3.5" /> Cetak Struk
+                                          {previewLoading === o.id ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                          ) : (
+                                            <Printer className="h-3.5 w-3.5" />
+                                          )}
+                                          Preview & Cetak
                                         </Button>
                                       </div>
                                     </>
