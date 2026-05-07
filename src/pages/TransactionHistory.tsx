@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { ReceiptPreviewDialog, type ReceiptPreviewData } from "@/components/pos/ReceiptPreviewDialog";
 import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { AppLayout } from "@/components/AppLayout";
