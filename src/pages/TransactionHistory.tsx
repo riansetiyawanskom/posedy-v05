@@ -365,13 +365,18 @@ export default function TransactionHistory() {
                               <Button
                                 variant="ghost"
                                 size="icon"
+                                disabled={previewLoading === o.id}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handlePrint(o);
                                 }}
-                                title="Cetak Struk"
+                                title="Preview & Cetak Struk"
                               >
-                                <Printer className="h-4 w-4" />
+                                {previewLoading === o.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Printer className="h-4 w-4" />
+                                )}
                               </Button>
                             </TableCell>
                           </TableRow>
