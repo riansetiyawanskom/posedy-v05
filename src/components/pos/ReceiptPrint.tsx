@@ -34,16 +34,19 @@ export const ReceiptPrint = forwardRef<HTMLDivElement, ReceiptPrintProps>(
     const storeAddress = settings?.address || "";
     const storePhone = settings?.phone || "";
 
+    const widthPx = getReceiptWidthPx(paperSize);
+
     return (
       <div
         ref={ref}
         className="receipt-thermal mx-auto bg-white text-black"
         style={{
-          width: "302px",
+          width: `${widthPx}px`,
           fontFamily: "'Courier New', Courier, monospace",
           fontSize: "12px",
           lineHeight: "1.4",
           padding: "12px 8px",
+          paddingBottom: `calc(12px + ${bottomGapMm}mm)`,
         }}
       >
         {/* Header */}
