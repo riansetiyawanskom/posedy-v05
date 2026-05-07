@@ -82,30 +82,43 @@ export default function TransactionHistory() {
   };
 
   const handlePrint = async (order: OrderRow) => {
-    let items: OrderItemRow[];
-    if (expandedId === order.id && expandedItems.length > 0) {
-      items = expandedItems;
-    } else {
-      items = await fetchOrderItems(order.id);
+    setPreviewLoading(order.id);
+    try {
+      let items: OrderItemRow[];
+      if (expandedId === order.id && expandedItems.length > 0) {
+        items = expandedItems;
+      } else {
+        items = await fetchOrderItems(order.id);
+      }
+      setPreviewData({
+        orderNumber: order.order_number,
+        date: formatDate(order.created_at),
+        paymentMethod: order.payment_method,
+        cart: {
+          items: items.map((i) => ({
+            product: {
+              id: i.product_id ?? i.id,
+              name: i.product_name,
+              price: i.unit_price,
+              stock: 0,
+              category: "",
+              sku: "",
+              image_url: null,
+            } as any,
+            quantity: i.quantity,
+          })),
+          subtotal: order.subtotal,
+          discount: order.discount,
+          tax: 0,
+          total: order.total,
+        },
+      });
+      setPreviewOpen(true);
+    } catch (err) {
+      toast.error(friendlyError(err, "Tidak bisa memuat detail struk."));
+    } finally {
+      setPreviewLoading(null);
     }
-    printOrderReceipt({
-      orderNumber: order.order_number,
-      date: formatDate(order.created_at),
-      paymentMethod: order.payment_method,
-      items: items.map((i) => ({
-        name: i.product_name,
-        quantity: i.quantity,
-        unitPrice: i.unit_price,
-        subtotal: i.subtotal,
-      })),
-      subtotal: order.subtotal,
-      discount: order.discount,
-      tax: order.tax,
-      total: order.total,
-      storeName: storeSettings?.store_name,
-      storePhone: storeSettings?.phone,
-      storeAddress: storeSettings?.address,
-    });
   };
 
   const handleExportCSV = () => {
