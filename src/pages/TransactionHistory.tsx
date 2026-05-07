@@ -513,6 +513,12 @@ export default function TransactionHistory() {
           </CardContent>
         </Card>
       </div>
+
+      <ReceiptPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        data={previewData}
+      />
     </AppLayout>
   );
 }
