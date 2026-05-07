@@ -5,7 +5,7 @@ import { id as localeId } from "date-fns/locale";
 import { AppLayout } from "@/components/AppLayout";
 import { useTransactionHistory, type OrderRow, type OrderItemRow } from "@/hooks/useTransactionHistory";
 import { formatRupiah } from "@/lib/format";
-import { printOrderReceipt } from "@/lib/printReceipt";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
