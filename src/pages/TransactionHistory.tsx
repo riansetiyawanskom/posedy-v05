@@ -38,6 +38,9 @@ export default function TransactionHistory() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<OrderItemRow[]>([]);
   const [loadingExpand, setLoadingExpand] = useState(false);
+  const [previewData, setPreviewData] = useState<ReceiptPreviewData | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState<string | null>(null);
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
