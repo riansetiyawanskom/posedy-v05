@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
+import { ReceiptPreviewDialog, type ReceiptPreviewData } from "@/components/pos/ReceiptPreviewDialog";
 import { format, startOfDay, endOfDay, isWithinInterval } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 import { AppLayout } from "@/components/AppLayout";
 import { useTransactionHistory, type OrderRow, type OrderItemRow } from "@/hooks/useTransactionHistory";
 import { formatRupiah } from "@/lib/format";
-import { printOrderReceipt } from "@/lib/printReceipt";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { friendlyError } from "@/lib/friendlyMessage";
 import { usePermissions } from "@/hooks/usePermissions";
-import { useStoreSettings } from "@/hooks/useStoreSettings";
+
 import { cn } from "@/lib/utils";
 
 const methodLabel: Record<string, string> = {
@@ -31,12 +32,15 @@ export default function TransactionHistory() {
   const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
   const { hasPermission } = usePermissions();
   const canResetTransactions = hasPermission("action:reset_transactions");
-  const { settings: storeSettings } = useStoreSettings();
+  
   const [search, setSearch] = useState("");
   const [resetting, setResetting] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<OrderItemRow[]>([]);
   const [loadingExpand, setLoadingExpand] = useState(false);
+  const [previewData, setPreviewData] = useState<ReceiptPreviewData | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState<string | null>(null);
 
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
@@ -78,30 +82,43 @@ export default function TransactionHistory() {
   };
 
   const handlePrint = async (order: OrderRow) => {
-    let items: OrderItemRow[];
-    if (expandedId === order.id && expandedItems.length > 0) {
-      items = expandedItems;
-    } else {
-      items = await fetchOrderItems(order.id);
+    setPreviewLoading(order.id);
+    try {
+      let items: OrderItemRow[];
+      if (expandedId === order.id && expandedItems.length > 0) {
+        items = expandedItems;
+      } else {
+        items = await fetchOrderItems(order.id);
+      }
+      setPreviewData({
+        orderNumber: order.order_number,
+        date: formatDate(order.created_at),
+        paymentMethod: order.payment_method,
+        cart: {
+          items: items.map((i) => ({
+            product: {
+              id: i.product_id ?? i.id,
+              name: i.product_name,
+              price: i.unit_price,
+              stock: 0,
+              category: "",
+              sku: "",
+              image_url: null,
+            } as any,
+            quantity: i.quantity,
+          })),
+          subtotal: order.subtotal,
+          discount: order.discount,
+          tax: 0,
+          total: order.total,
+        },
+      });
+      setPreviewOpen(true);
+    } catch (err) {
+      toast.error(friendlyError(err, "Tidak bisa memuat detail struk."));
+    } finally {
+      setPreviewLoading(null);
     }
-    printOrderReceipt({
-      orderNumber: order.order_number,
-      date: formatDate(order.created_at),
-      paymentMethod: order.payment_method,
-      items: items.map((i) => ({
-        name: i.product_name,
-        quantity: i.quantity,
-        unitPrice: i.unit_price,
-        subtotal: i.subtotal,
-      })),
-      subtotal: order.subtotal,
-      discount: order.discount,
-      tax: order.tax,
-      total: order.total,
-      storeName: storeSettings?.store_name,
-      storePhone: storeSettings?.phone,
-      storeAddress: storeSettings?.address,
-    });
   };
 
   const handleExportCSV = () => {
@@ -348,13 +365,18 @@ export default function TransactionHistory() {
                               <Button
                                 variant="ghost"
                                 size="icon"
+                                disabled={previewLoading === o.id}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handlePrint(o);
                                 }}
-                                title="Cetak Struk"
+                                title="Preview & Cetak Struk"
                               >
-                                <Printer className="h-4 w-4" />
+                                {previewLoading === o.id ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : (
+                                  <Printer className="h-4 w-4" />
+                                )}
                               </Button>
                             </TableCell>
                           </TableRow>
@@ -461,12 +483,18 @@ export default function TransactionHistory() {
                                           size="sm"
                                           variant="outline"
                                           className="gap-1.5"
+                                          disabled={previewLoading === o.id}
                                           onClick={(e) => {
                                             e.stopPropagation();
                                             handlePrint(o);
                                           }}
                                         >
-                                          <Printer className="h-3.5 w-3.5" /> Cetak Struk
+                                          {previewLoading === o.id ? (
+                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                          ) : (
+                                            <Printer className="h-3.5 w-3.5" />
+                                          )}
+                                          Preview & Cetak
                                         </Button>
                                       </div>
                                     </>
@@ -485,6 +513,12 @@ export default function TransactionHistory() {
           </CardContent>
         </Card>
       </div>
+
+      <ReceiptPreviewDialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        data={previewData}
+      />
     </AppLayout>
   );
 }
