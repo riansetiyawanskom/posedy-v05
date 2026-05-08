@@ -6,7 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Save, Store, AlertTriangle, Trash2 } from "lucide-react";
+import { Loader2, Save, Store, AlertTriangle, Trash2, Percent } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useStoreSettings } from "@/hooks/useStoreSettings";
 import {
   AlertDialog,
