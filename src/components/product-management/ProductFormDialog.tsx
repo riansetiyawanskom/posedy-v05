@@ -39,7 +39,16 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
   const scanBuffer = useRef("");
   const scanTimeout = useRef<ReturnType<typeof setTimeout>>();
 
-  const isEdit = !!product;
+  const { settings } = useStoreSettings();
+  const marginEnabled = !!settings?.margin_enabled;
+  const marginType = settings?.margin_type ?? "percentage";
+  const marginValue = Number(settings?.margin_value ?? 0);
+
+  const computePrice = (cost: number) => {
+    if (!marginEnabled || !cost) return 0;
+    if (marginType === "percentage") return Math.round(cost * (1 + marginValue / 100));
+    return Math.round(cost + marginValue);
+  };
 
   useEffect(() => {
     if (product) {
