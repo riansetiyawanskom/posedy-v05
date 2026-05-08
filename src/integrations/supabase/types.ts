@@ -498,6 +498,9 @@ export type Database = {
         Row: {
           address: string | null
           id: string
+          margin_enabled: boolean
+          margin_type: string
+          margin_value: number
           phone: string | null
           store_name: string
           updated_at: string
@@ -506,6 +509,9 @@ export type Database = {
         Insert: {
           address?: string | null
           id?: string
+          margin_enabled?: boolean
+          margin_type?: string
+          margin_value?: number
           phone?: string | null
           store_name?: string
           updated_at?: string
@@ -514,6 +520,9 @@ export type Database = {
         Update: {
           address?: string | null
           id?: string
+          margin_enabled?: boolean
+          margin_type?: string
+          margin_value?: number
           phone?: string | null
           store_name?: string
           updated_at?: string

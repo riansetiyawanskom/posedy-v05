@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "./ImageUpload";
 import { BarcodeDisplay } from "./BarcodeDisplay";
-import { ScanBarcode, Keyboard } from "lucide-react";
+import { ScanBarcode, Keyboard, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface Props {
   open: boolean;
@@ -37,6 +38,17 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
   const skuInputRef = useRef<HTMLInputElement>(null);
   const scanBuffer = useRef("");
   const scanTimeout = useRef<ReturnType<typeof setTimeout>>();
+
+  const { settings } = useStoreSettings();
+  const marginEnabled = !!settings?.margin_enabled;
+  const marginType = settings?.margin_type ?? "percentage";
+  const marginValue = Number(settings?.margin_value ?? 0);
+
+  const computePrice = (cost: number) => {
+    if (!marginEnabled || !cost) return 0;
+    if (marginType === "percentage") return Math.round(cost * (1 + marginValue / 100));
+    return Math.round(cost + marginValue);
+  };
 
   const isEdit = !!product;
 
@@ -168,7 +180,10 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
             <div className="space-y-1.5 sm:col-span-2">
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="price">Harga Jual *</Label>
+                  <Label htmlFor="price" className="flex items-center gap-1">
+                    Harga Jual *
+                    {marginEnabled && <Sparkles className="h-3 w-3 text-primary" />}
+                  </Label>
                   <Input
                     id="price"
                     inputMode="numeric"
@@ -179,7 +194,15 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
                       setForm({ ...form, price: raw ? Number(raw) : 0 });
                     }}
                     required
+                    readOnly={marginEnabled}
+                    className={marginEnabled ? "bg-muted/50 cursor-not-allowed" : ""}
+                    title={marginEnabled ? "Otomatis dari HPP — nonaktifkan margin di Pengaturan untuk edit manual" : ""}
                   />
+                  {marginEnabled && (
+                    <p className="text-xs text-muted-foreground">
+                      Auto: HPP {marginType === "percentage" ? `+ ${marginValue}%` : `+ Rp ${marginValue.toLocaleString("id-ID")}`}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="cost">HPP</Label>
@@ -190,7 +213,12 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
                     value={form.cost_price ? form.cost_price.toLocaleString("id-ID") : ""}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/\D/g, "");
-                      setForm({ ...form, cost_price: raw ? Number(raw) : 0 });
+                      const cost = raw ? Number(raw) : 0;
+                      setForm((f) => ({
+                        ...f,
+                        cost_price: cost,
+                        price: marginEnabled ? computePrice(cost) : f.price,
+                      }));
                     }}
                   />
                 </div>

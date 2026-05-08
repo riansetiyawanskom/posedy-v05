@@ -8,8 +8,20 @@ export interface StoreSettings {
   store_name: string;
   phone: string;
   address: string;
+  margin_enabled: boolean;
+  margin_type: "percentage" | "fixed";
+  margin_value: number;
   updated_at: string;
   updated_by: string | null;
+}
+
+export interface StoreSettingsUpdate {
+  store_name: string;
+  phone: string;
+  address: string;
+  margin_enabled?: boolean;
+  margin_type?: "percentage" | "fixed";
+  margin_value?: number;
 }
 
 export function useStoreSettings() {
@@ -29,7 +41,7 @@ export function useStoreSettings() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (values: { store_name: string; phone: string; address: string }) => {
+    mutationFn: async (values: StoreSettingsUpdate) => {
       if (!settings?.id) throw new Error("Pengaturan toko belum tersedia. Coba muat ulang halaman.");
       const { error } = await supabase
         .from("store_settings")
