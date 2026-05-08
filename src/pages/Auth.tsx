@@ -18,6 +18,20 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [storeSettings, setStoreSettings] = useState<{ store_name: string; address: string } | null>(null);
+  const [storeLoading, setStoreLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("store_settings")
+      .select("store_name, address")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setStoreSettings({ store_name: data.store_name, address: data.address ?? "" });
+        setStoreLoading(false);
+      });
+  }, []);
 
   if (loading) {
     return (
