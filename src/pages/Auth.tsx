@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -18,6 +18,20 @@ export default function Auth() {
   const [fullName, setFullName] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [storeSettings, setStoreSettings] = useState<{ store_name: string; address: string } | null>(null);
+  const [storeLoading, setStoreLoading] = useState(true);
+
+  useEffect(() => {
+    supabase
+      .from("store_settings")
+      .select("store_name, address")
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) setStoreSettings({ store_name: data.store_name, address: data.address ?? "" });
+        setStoreLoading(false);
+      });
+  }, []);
 
   if (loading) {
     return (
@@ -96,13 +110,16 @@ export default function Auth() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent">
             <Store className="h-6 w-6 text-accent-foreground" />
           </div>
           <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-            POS System
+            {storeLoading ? "…" : (storeSettings?.store_name || "POS System")}
           </h1>
+          {storeSettings?.address && (
+            <p className="text-xs text-muted-foreground max-w-xs">{storeSettings.address}</p>
+          )}
           <p className="text-sm text-muted-foreground">
             {mode === "login" && "Masuk ke akun Anda"}
             {mode === "register" && "Buat akun baru"}
