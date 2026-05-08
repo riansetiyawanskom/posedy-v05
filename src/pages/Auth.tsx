@@ -96,13 +96,16 @@ export default function Auth() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-accent">
             <Store className="h-6 w-6 text-accent-foreground" />
           </div>
           <h1 className="text-xl font-extrabold tracking-tight text-foreground">
-            POS System
+            {storeLoading ? "…" : (storeSettings?.store_name || "POS System")}
           </h1>
+          {storeSettings?.address && (
+            <p className="text-xs text-muted-foreground max-w-xs">{storeSettings.address}</p>
+          )}
           <p className="text-sm text-muted-foreground">
             {mode === "login" && "Masuk ke akun Anda"}
             {mode === "register" && "Buat akun baru"}
