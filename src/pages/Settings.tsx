@@ -129,10 +129,94 @@ export default function Settings() {
               <Label htmlFor="address">Alamat</Label>
               <Textarea id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Masukkan alamat toko" rows={3} />
             </div>
-            <Button onClick={() => updateSettings({ store_name: storeName, phone, address })} disabled={isUpdating} className="gap-2">
+            <Button
+              onClick={() =>
+                updateSettings({
+                  store_name: storeName,
+                  phone,
+                  address,
+                  margin_enabled: marginEnabled,
+                  margin_type: marginType,
+                  margin_value: marginValue ? Number(marginValue) : 0,
+                })
+              }
+              disabled={isUpdating}
+              className="gap-2"
+            >
               {isUpdating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
               Simpan Pengaturan
             </Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Percent className="h-5 w-5" />
+              Margin Profit Otomatis
+            </CardTitle>
+            <CardDescription>
+              Jika aktif, Harga Jual produk akan otomatis dihitung dari HPP saat menambah/mengedit produk.
+              Jika nonaktif, Harga Jual diisi manual.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between rounded-md border border-border p-3">
+              <div className="space-y-0.5">
+                <Label htmlFor="margin-toggle" className="text-sm font-medium">Aktifkan Margin Otomatis</Label>
+                <p className="text-xs text-muted-foreground">
+                  {marginEnabled ? "Harga Jual = HPP + margin" : "Harga Jual diisi manual"}
+                </p>
+              </div>
+              <Switch id="margin-toggle" checked={marginEnabled} onCheckedChange={setMarginEnabled} />
+            </div>
+
+            {marginEnabled && (
+              <>
+                <div className="space-y-2">
+                  <Label>Jenis Margin</Label>
+                  <RadioGroup
+                    value={marginType}
+                    onValueChange={(v) => setMarginType(v as "percentage" | "fixed")}
+                    className="grid grid-cols-2 gap-2"
+                  >
+                    <label className="flex items-center gap-2 rounded-md border border-border p-3 cursor-pointer hover:bg-accent/30">
+                      <RadioGroupItem value="percentage" id="m-pct" />
+                      <span className="text-sm">Persentase (%)</span>
+                    </label>
+                    <label className="flex items-center gap-2 rounded-md border border-border p-3 cursor-pointer hover:bg-accent/30">
+                      <RadioGroupItem value="fixed" id="m-fixed" />
+                      <span className="text-sm">Nominal Tetap (Rp)</span>
+                    </label>
+                  </RadioGroup>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="margin-value">
+                    Nilai Margin {marginType === "percentage" ? "(%)" : "(Rp)"}
+                  </Label>
+                  <Input
+                    id="margin-value"
+                    inputMode="numeric"
+                    placeholder={marginType === "percentage" ? "Contoh: 20" : "Contoh: 5000"}
+                    value={
+                      marginType === "fixed" && marginValue
+                        ? Number(marginValue).toLocaleString("id-ID")
+                        : marginValue
+                    }
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/\D/g, "");
+                      setMarginValue(raw);
+                    }}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {marginType === "percentage"
+                      ? "Harga Jual = HPP × (1 + margin/100). Contoh: HPP 10.000 + 20% = 12.000"
+                      : "Harga Jual = HPP + nominal. Contoh: HPP 10.000 + Rp 5.000 = 15.000"}
+                  </p>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
