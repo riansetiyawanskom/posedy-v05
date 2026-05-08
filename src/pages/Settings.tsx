@@ -40,6 +40,9 @@ export default function Settings() {
   const [storeName, setStoreName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [marginEnabled, setMarginEnabled] = useState(false);
+  const [marginType, setMarginType] = useState<"percentage" | "fixed">("percentage");
+  const [marginValue, setMarginValue] = useState<string>("");
   const [selected, setSelected] = useState<Set<Scope>>(new Set());
   const [confirmText, setConfirmText] = useState("");
   const [resetting, setResetting] = useState(false);
@@ -50,6 +53,9 @@ export default function Settings() {
       setStoreName(settings.store_name);
       setPhone(settings.phone ?? "");
       setAddress(settings.address ?? "");
+      setMarginEnabled(settings.margin_enabled ?? false);
+      setMarginType((settings.margin_type as "percentage" | "fixed") ?? "percentage");
+      setMarginValue(settings.margin_value ? String(settings.margin_value) : "");
     }
   }, [settings]);
 
