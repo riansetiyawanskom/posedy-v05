@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { ImageUpload } from "./ImageUpload";
 import { BarcodeDisplay } from "./BarcodeDisplay";
-import { ScanBarcode, Keyboard } from "lucide-react";
+import { ScanBarcode, Keyboard, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import { useStoreSettings } from "@/hooks/useStoreSettings";
 
 interface Props {
   open: boolean;
