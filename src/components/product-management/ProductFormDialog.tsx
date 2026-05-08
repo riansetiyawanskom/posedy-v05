@@ -48,8 +48,9 @@ export function ProductFormDialog({ open, onOpenChange, product, categories }: P
     if (!marginEnabled || !cost) return 0;
     if (marginType === "percentage") return Math.round(cost * (1 + marginValue / 100));
     return Math.round(cost + marginValue);
-  const isEdit = !!product;
+  };
 
+  const isEdit = !!product;
 
   useEffect(() => {
     if (product) {
