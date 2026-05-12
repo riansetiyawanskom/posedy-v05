@@ -203,13 +203,6 @@ export default function Auth() {
             {mode === "forgot" && "Kirim Link Reset"}
           </Button>
 
-          {mode === "login" && (
-            <div className="rounded-md border border-dashed border-border bg-muted/30 p-2.5 text-center text-[11px] text-muted-foreground space-y-0.5">
-              <p><span className="font-semibold text-foreground">Akses Admin:</span> admin@demo.pos / admin123</p>
-              <p><span className="font-semibold text-foreground">Akses Kasir:</span> kasir@demo.pos / kasir123</p>
-            </div>
-          )}
-
         </form>
 
         {mode !== "login" && (
