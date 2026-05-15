@@ -314,6 +314,7 @@ export default function TransactionHistory() {
                       <TableHead className="w-8"></TableHead>
                       <TableHead>No. Order</TableHead>
                       <TableHead>Tanggal</TableHead>
+                      <TableHead>Pelanggan</TableHead>
                       <TableHead>Metode</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                       <TableHead>Status</TableHead>
@@ -342,6 +343,9 @@ export default function TransactionHistory() {
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {formatDate(o.created_at)}
+                            </TableCell>
+                            <TableCell className="text-sm text-card-foreground">
+                              {o.customer_name ?? <span className="text-muted-foreground italic">Walk-in</span>}
                             </TableCell>
                             <TableCell>
                               <Badge variant="outline" className="text-xs">
