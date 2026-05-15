@@ -71,6 +71,45 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string | null
@@ -123,6 +162,7 @@ export type Database = {
         Row: {
           cashier_id: string | null
           created_at: string | null
+          customer_id: string | null
           discount: number
           id: string
           notes: string | null
@@ -136,6 +176,7 @@ export type Database = {
         Insert: {
           cashier_id?: string | null
           created_at?: string | null
+          customer_id?: string | null
           discount?: number
           id?: string
           notes?: string | null
@@ -149,6 +190,7 @@ export type Database = {
         Update: {
           cashier_id?: string | null
           created_at?: string | null
+          customer_id?: string | null
           discount?: number
           id?: string
           notes?: string | null
@@ -159,7 +201,15 @@ export type Database = {
           tax?: number
           total?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "orders_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       permissions: {
         Row: {
