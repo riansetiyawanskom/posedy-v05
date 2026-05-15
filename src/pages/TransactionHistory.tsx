@@ -389,7 +389,7 @@ export default function TransactionHistory() {
                           {/* Expanded detail panel */}
                           {isExpanded && (
                             <TableRow key={`${o.id}-detail`}>
-                              <TableCell colSpan={7} className="p-0 border-b border-border">
+                              <TableCell colSpan={8} className="p-0 border-b border-border">
                                 <div className="bg-muted/20 px-6 py-4 space-y-3">
                                   {loadingExpand ? (
                                     <div className="flex justify-center py-4">
