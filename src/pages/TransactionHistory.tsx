@@ -49,6 +49,7 @@ export default function TransactionHistory() {
     return orders.filter((o) => {
       const matchSearch =
         o.order_number.toLowerCase().includes(search.toLowerCase()) ||
+        (o.customer_name ?? "").toLowerCase().includes(search.toLowerCase()) ||
         (methodLabel[o.payment_method] ?? o.payment_method)
           .toLowerCase()
           .includes(search.toLowerCase());
