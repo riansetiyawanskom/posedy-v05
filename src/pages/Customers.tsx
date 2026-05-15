@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { AppLayout } from "@/components/AppLayout";
 import { useCustomers, useCustomerOrders, type Customer } from "@/hooks/useCustomers";
-import { usePermissions } from "@/hooks/usePermissions";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,8 +39,8 @@ const methodLabel: Record<string, string> = {
 
 export default function Customers() {
   const { data: customers, isLoading } = useCustomers();
-  const { hasPermission } = usePermissions();
-  const isAdmin = hasPermission("module:users"); // admin proxy; only admin has users module
+  const { roles } = useUserRole();
+  const isAdmin = roles.includes("admin");
   const qc = useQueryClient();
 
   const [search, setSearch] = useState("");
