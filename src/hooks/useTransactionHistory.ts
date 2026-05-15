@@ -12,6 +12,8 @@ export interface OrderRow {
   status: string;
   created_at: string;
   cashier_id: string | null;
+  customer_id: string | null;
+  customer_name?: string | null;
   notes: string | null;
 }
 
@@ -31,11 +33,14 @@ export function useTransactionHistory() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("orders")
-        .select("*")
+        .select("*, customers(name)")
         .order("created_at", { ascending: false })
         .limit(500);
       if (error) throw error;
-      return data as OrderRow[];
+      return ((data ?? []) as any[]).map((o) => ({
+        ...o,
+        customer_name: o.customers?.name ?? null,
+      })) as OrderRow[];
     },
   });
 

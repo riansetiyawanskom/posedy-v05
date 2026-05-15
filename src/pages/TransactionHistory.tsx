@@ -49,6 +49,7 @@ export default function TransactionHistory() {
     return orders.filter((o) => {
       const matchSearch =
         o.order_number.toLowerCase().includes(search.toLowerCase()) ||
+        (o.customer_name ?? "").toLowerCase().includes(search.toLowerCase()) ||
         (methodLabel[o.payment_method] ?? o.payment_method)
           .toLowerCase()
           .includes(search.toLowerCase());
@@ -313,6 +314,7 @@ export default function TransactionHistory() {
                       <TableHead className="w-8"></TableHead>
                       <TableHead>No. Order</TableHead>
                       <TableHead>Tanggal</TableHead>
+                      <TableHead>Pelanggan</TableHead>
                       <TableHead>Metode</TableHead>
                       <TableHead className="text-right">Total</TableHead>
                       <TableHead>Status</TableHead>
@@ -341,6 +343,9 @@ export default function TransactionHistory() {
                             </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
                               {formatDate(o.created_at)}
+                            </TableCell>
+                            <TableCell className="text-sm text-card-foreground">
+                              {o.customer_name ?? <span className="text-muted-foreground italic">Walk-in</span>}
                             </TableCell>
                             <TableCell>
                               <Badge variant="outline" className="text-xs">
@@ -384,7 +389,7 @@ export default function TransactionHistory() {
                           {/* Expanded detail panel */}
                           {isExpanded && (
                             <TableRow key={`${o.id}-detail`}>
-                              <TableCell colSpan={7} className="p-0 border-b border-border">
+                              <TableCell colSpan={8} className="p-0 border-b border-border">
                                 <div className="bg-muted/20 px-6 py-4 space-y-3">
                                   {loadingExpand ? (
                                     <div className="flex justify-center py-4">

@@ -13,6 +13,7 @@ import StockOpname from "./pages/StockOpname.tsx";
 import TransactionHistory from "./pages/TransactionHistory.tsx";
 import UserManagement from "./pages/UserManagement.tsx";
 import ProductManagement from "./pages/ProductManagement.tsx";
+import Customers from "./pages/Customers.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import Reports from "./pages/Reports.tsx";
 import ActivityLogs from "./pages/ActivityLogs.tsx";
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/" element={<ProtectedRoute requiredPermission="module:pos"><Index /></ProtectedRoute>} />
             <Route path="/stock-opname" element={<ProtectedRoute requiredPermission="module:stock_opname"><StockOpname /></ProtectedRoute>} />
             <Route path="/transactions" element={<ProtectedRoute requiredPermission="module:transactions"><TransactionHistory /></ProtectedRoute>} />
+            <Route path="/customers" element={<ProtectedRoute requiredPermission="module:customers"><Customers /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute requiredPermission="module:dashboard"><Dashboard /></ProtectedRoute>} />
             <Route path="/product-management" element={<ProtectedRoute requiredPermission="module:products"><ProductManagement /></ProtectedRoute>} />
             <Route path="/purchasing" element={<ProtectedRoute requiredPermission="module:purchasing"><Purchasing /></ProtectedRoute>} />

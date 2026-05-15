@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Banknote, CreditCard, Wallet, CheckCircle2, Loader2, Printer } from "lucide-react";
+import { Banknote, CreditCard, Wallet, CheckCircle2, Loader2, Printer, UserPlus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatRupiah } from "@/lib/format";
 import type { Cart } from "@/types/pos";
@@ -17,6 +17,10 @@ import { toast } from "sonner";
 import { friendlyError } from "@/lib/friendlyMessage";
 import { ReceiptPrint } from "./ReceiptPrint";
 import { printReceiptElement } from "@/lib/printReceipt";
+import { useCustomers, type Customer } from "@/hooks/useCustomers";
+import { useQueryClient } from "@tanstack/react-query";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 type PaymentMethod = "cash" | "card" | "ewallet";
 
@@ -38,6 +42,12 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
   const [cashAmount, setCashAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [customerPickerOpen, setCustomerPickerOpen] = useState(false);
+  const [newCustomerOpen, setNewCustomerOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [savingCustomer, setSavingCustomer] = useState(false);
   const [receiptData, setReceiptData] = useState<{
     orderNumber: string;
     date: string;
@@ -49,10 +59,34 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
   } | null>(null);
   const receiptRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const { data: customers } = useCustomers();
+  const qc = useQueryClient();
 
   const cashNum = Number(cashAmount) || 0;
   const change = cashNum - cart.total;
   const canPay = method !== "cash" || cashNum >= cart.total;
+
+  const handleQuickAddCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newName.trim()) return;
+    setSavingCustomer(true);
+    const { data, error } = await supabase
+      .from("customers")
+      .insert({ name: newName.trim(), phone: newPhone.trim() || null })
+      .select("*")
+      .single();
+    setSavingCustomer(false);
+    if (error) {
+      toast.error(friendlyError(error, "Pelanggan belum bisa ditambahkan."));
+      return;
+    }
+    qc.invalidateQueries({ queryKey: ["customers"] });
+    setCustomer(data as Customer);
+    setNewName("");
+    setNewPhone("");
+    setNewCustomerOpen(false);
+    toast.success("Pelanggan ditambahkan ✓");
+  };
 
   const handlePay = async () => {
     if (!canPay) return;
@@ -73,6 +107,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
           payment_method: method,
           status: "completed",
           cashier_id: user?.id,
+          customer_id: customer?.id ?? null,
         })
         .select("id")
         .single();
@@ -131,6 +166,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
     setReceiptData(null);
     setCashAmount("");
     setMethod("cash");
+    setCustomer(null);
     onSuccess();
     onClose();
   };
@@ -141,6 +177,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
       setReceiptData(null);
       setCashAmount("");
       setMethod("cash");
+      setCustomer(null);
       onClose();
     }
   };
@@ -198,7 +235,57 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
                 </p>
               </div>
 
-              {/* Payment method */}
+              {/* Customer */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Pelanggan (opsional)</label>
+                {customer ? (
+                  <div className="flex items-center justify-between rounded-md border border-border bg-muted/40 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-card-foreground truncate">{customer.name}</p>
+                      {customer.phone && <p className="text-xs text-muted-foreground truncate">{customer.phone}</p>}
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCustomer(null)} title="Lepas">
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Popover open={customerPickerOpen} onOpenChange={setCustomerPickerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="flex-1 justify-start text-sm font-normal text-muted-foreground">
+                          Pilih pelanggan...
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-card border-border" align="start">
+                        <Command>
+                          <CommandInput placeholder="Cari nama / telepon..." />
+                          <CommandList>
+                            <CommandEmpty>Tidak ada pelanggan</CommandEmpty>
+                            <CommandGroup>
+                              {(customers ?? []).map((c) => (
+                                <CommandItem
+                                  key={c.id}
+                                  value={`${c.name} ${c.phone ?? ""}`}
+                                  onSelect={() => { setCustomer(c); setCustomerPickerOpen(false); }}
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-sm">{c.name}</span>
+                                    {c.phone && <span className="text-xs text-muted-foreground">{c.phone}</span>}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <Button variant="outline" size="icon" onClick={() => setNewCustomerOpen(true)} title="Tambah pelanggan baru">
+                      <UserPlus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-3 gap-2">
                 {methods.map((m) => (
                   <button
@@ -274,6 +361,22 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
           </>
         )}
       </DialogContent>
+
+      <Dialog open={newCustomerOpen} onOpenChange={setNewCustomerOpen}>
+        <DialogContent className="sm:max-w-md bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="text-card-foreground">Pelanggan Baru</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleQuickAddCustomer} className="space-y-2.5">
+            <Input placeholder="Nama Pelanggan *" value={newName} onChange={(e) => setNewName(e.target.value)} required maxLength={100} className="bg-card border-border" autoFocus />
+            <Input placeholder="Telepon" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} maxLength={30} className="bg-card border-border" />
+            <Button variant="pos" className="w-full" disabled={savingCustomer}>
+              {savingCustomer && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Simpan
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
