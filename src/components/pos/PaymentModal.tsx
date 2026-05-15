@@ -107,6 +107,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
           payment_method: method,
           status: "completed",
           cashier_id: user?.id,
+          customer_id: customer?.id ?? null,
         })
         .select("id")
         .single();
@@ -165,6 +166,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
     setReceiptData(null);
     setCashAmount("");
     setMethod("cash");
+    setCustomer(null);
     onSuccess();
     onClose();
   };
@@ -175,6 +177,7 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
       setReceiptData(null);
       setCashAmount("");
       setMethod("cash");
+      setCustomer(null);
       onClose();
     }
   };
