@@ -235,7 +235,57 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
                 </p>
               </div>
 
-              {/* Payment method */}
+              {/* Customer */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Pelanggan (opsional)</label>
+                {customer ? (
+                  <div className="flex items-center justify-between rounded-md border border-border bg-muted/40 px-3 py-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-card-foreground truncate">{customer.name}</p>
+                      {customer.phone && <p className="text-xs text-muted-foreground truncate">{customer.phone}</p>}
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setCustomer(null)} title="Lepas">
+                      <X className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Popover open={customerPickerOpen} onOpenChange={setCustomerPickerOpen}>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" className="flex-1 justify-start text-sm font-normal text-muted-foreground">
+                          Pilih pelanggan...
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-card border-border" align="start">
+                        <Command>
+                          <CommandInput placeholder="Cari nama / telepon..." />
+                          <CommandList>
+                            <CommandEmpty>Tidak ada pelanggan</CommandEmpty>
+                            <CommandGroup>
+                              {(customers ?? []).map((c) => (
+                                <CommandItem
+                                  key={c.id}
+                                  value={`${c.name} ${c.phone ?? ""}`}
+                                  onSelect={() => { setCustomer(c); setCustomerPickerOpen(false); }}
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="text-sm">{c.name}</span>
+                                    {c.phone && <span className="text-xs text-muted-foreground">{c.phone}</span>}
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <Button variant="outline" size="icon" onClick={() => setNewCustomerOpen(true)} title="Tambah pelanggan baru">
+                      <UserPlus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-3 gap-2">
                 {methods.map((m) => (
                   <button
