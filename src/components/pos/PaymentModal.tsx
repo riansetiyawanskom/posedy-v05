@@ -361,6 +361,22 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
           </>
         )}
       </DialogContent>
+
+      <Dialog open={newCustomerOpen} onOpenChange={setNewCustomerOpen}>
+        <DialogContent className="sm:max-w-md bg-card border-border">
+          <DialogHeader>
+            <DialogTitle className="text-card-foreground">Pelanggan Baru</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleQuickAddCustomer} className="space-y-2.5">
+            <Input placeholder="Nama Pelanggan *" value={newName} onChange={(e) => setNewName(e.target.value)} required maxLength={100} className="bg-card border-border" autoFocus />
+            <Input placeholder="Telepon" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} maxLength={30} className="bg-card border-border" />
+            <Button variant="pos" className="w-full" disabled={savingCustomer}>
+              {savingCustomer && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Simpan
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }
