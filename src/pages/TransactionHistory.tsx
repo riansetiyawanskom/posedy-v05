@@ -188,7 +188,26 @@ export default function TransactionHistory() {
     }
   };
 
+  const handleVoid = async (order: OrderRow) => {
+    setVoidingId(order.id);
+    try {
+      const { error } = await supabase.rpc("void_order", {
+        p_order_id: order.id,
+        p_reason: null,
+      });
+      if (error) throw error;
+      toast.success(`Pesanan ${order.order_number} dibatalkan, stok dikembalikan ✓`);
+      qc.invalidateQueries({ queryKey: ["products"] });
+      refetch();
+    } catch (err) {
+      toast.error(friendlyError(err, "Pesanan belum bisa dibatalkan."));
+    } finally {
+      setVoidingId(null);
+    }
+  };
+
   const formatDate = (iso: string) =>
+
     new Date(iso).toLocaleString("id-ID", {
       day: "2-digit",
       month: "short",
