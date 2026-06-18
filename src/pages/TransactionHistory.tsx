@@ -393,23 +393,59 @@ export default function TransactionHistory() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                disabled={previewLoading === o.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePrint(o);
-                                }}
-                                title="Preview & Cetak Struk"
-                              >
-                                {previewLoading === o.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Printer className="h-4 w-4" />
+                              <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  disabled={previewLoading === o.id}
+                                  onClick={() => handlePrint(o)}
+                                  title="Preview & Cetak Struk"
+                                >
+                                  {previewLoading === o.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Printer className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                {isAdmin && o.status === "completed" && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        disabled={voidingId === o.id}
+                                        title="Batalkan pesanan (kembalikan stok)"
+                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                      >
+                                        {voidingId === o.id ? (
+                                          <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <Ban className="h-4 w-4" />
+                                        )}
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Batalkan pesanan {o.order_number}?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Status pesanan akan diubah menjadi <strong>cancelled</strong> dan stok produk akan dikembalikan secara otomatis. Tindakan ini tidak dapat dibatalkan.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Tidak</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => handleVoid(o)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Ya, batalkan
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 )}
-                              </Button>
+                              </div>
                             </TableCell>
+
                           </TableRow>
 
                           {/* Expanded detail panel */}
