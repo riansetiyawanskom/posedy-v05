@@ -76,6 +76,8 @@ export type Database = {
           address: string | null
           created_at: string
           created_by: string | null
+          credit_limit: number | null
+          current_debt: number | null
           email: string | null
           id: string
           is_active: boolean
@@ -88,6 +90,8 @@ export type Database = {
           address?: string | null
           created_at?: string
           created_by?: string | null
+          credit_limit?: number | null
+          current_debt?: number | null
           email?: string | null
           id?: string
           is_active?: boolean
@@ -100,6 +104,8 @@ export type Database = {
           address?: string | null
           created_at?: string
           created_by?: string | null
+          credit_limit?: number | null
+          current_debt?: number | null
           email?: string | null
           id?: string
           is_active?: boolean
@@ -160,42 +166,57 @@ export type Database = {
       }
       orders: {
         Row: {
+          amount_paid: number | null
           cashier_id: string | null
           created_at: string | null
           customer_id: string | null
           discount: number
+          due_date: string | null
           id: string
+          invoice_number: string | null
+          is_wholesale: boolean | null
           notes: string | null
           order_number: string
           payment_method: string
+          payment_status: string | null
           status: string
           subtotal: number
           tax: number
           total: number
         }
         Insert: {
+          amount_paid?: number | null
           cashier_id?: string | null
           created_at?: string | null
           customer_id?: string | null
           discount?: number
+          due_date?: string | null
           id?: string
+          invoice_number?: string | null
+          is_wholesale?: boolean | null
           notes?: string | null
           order_number: string
           payment_method?: string
+          payment_status?: string | null
           status?: string
           subtotal: number
           tax?: number
           total: number
         }
         Update: {
+          amount_paid?: number | null
           cashier_id?: string | null
           created_at?: string | null
           customer_id?: string | null
           discount?: number
+          due_date?: string | null
           id?: string
+          invoice_number?: string | null
+          is_wholesale?: boolean | null
           notes?: string | null
           order_number?: string
           payment_method?: string
+          payment_status?: string | null
           status?: string
           subtotal?: number
           tax?: number
@@ -288,18 +309,21 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          last_login: string | null
         }
         Insert: {
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id: string
+          last_login?: string | null
         }
         Update: {
           created_at?: string | null
           email?: string | null
           full_name?: string | null
           id?: string
+          last_login?: string | null
         }
         Relationships: []
       }
@@ -652,6 +676,10 @@ export type Database = {
       generate_order_number: { Args: never; Returns: string }
       generate_po_number: { Args: never; Returns: string }
       has_role: { Args: { _role: string; _user_id: string }; Returns: boolean }
+      increment_customer_debt: {
+        Args: { p_amount: number; p_customer_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
