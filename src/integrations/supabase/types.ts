@@ -680,6 +680,17 @@ export type Database = {
         Args: { p_amount: number; p_customer_id: string }
         Returns: undefined
       }
+      process_sale: {
+        Args: { p_items: Json; p_payload: Json }
+        Returns: {
+          order_id: string
+          order_number: string
+        }[]
+      }
+      void_order: {
+        Args: { p_order_id: string; p_reason?: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
