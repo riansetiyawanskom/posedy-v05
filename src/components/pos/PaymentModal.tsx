@@ -93,29 +93,15 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
     setLoading(true);
 
     try {
-      const { data: orderNumData } = await supabase.rpc("generate_order_number");
-      const orderNumber = orderNumData ?? `POS-${Date.now()}`;
-
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert({
-          order_number: orderNumber,
-          subtotal: cart.subtotal,
-          tax: 0,
-          discount: cart.discount,
-          total: cart.total,
-          payment_method: method,
-          status: "completed",
-          cashier_id: user?.id,
-          customer_id: customer?.id ?? null,
-        })
-        .select("id")
-        .single();
-
-      if (orderError) throw orderError;
-
+      const payload = {
+        subtotal: cart.subtotal,
+        tax: 0,
+        discount: cart.discount,
+        total: cart.total,
+        payment_method: method,
+        customer_id: customer?.id ?? null,
+      };
       const items = cart.items.map((i) => ({
-        order_id: order.id,
         product_id: i.product.id,
         product_name: i.product.name,
         quantity: i.quantity,
@@ -123,11 +109,17 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
         subtotal: i.product.price * i.quantity,
       }));
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(items);
+      const { data: rpcData, error: rpcError } = await supabase.rpc("process_sale", {
+        p_payload: payload as any,
+        p_items: items as any,
+      });
 
-      if (itemsError) throw itemsError;
+      if (rpcError) throw rpcError;
+      const result = Array.isArray(rpcData) ? rpcData[0] : rpcData;
+      const orderNumber = result?.order_number ?? `POS-${Date.now()}`;
+
+      // Refresh produk supaya stok terbaru terlihat di grid
+      qc.invalidateQueries({ queryKey: ["products"] });
 
       // Prepare receipt data
       setReceiptData({
@@ -154,6 +146,8 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
       setLoading(false);
     }
   };
+
+
 
   const handlePrint = () => {
     if (receiptRef.current) {

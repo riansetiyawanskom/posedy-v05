@@ -13,12 +13,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
+import { Search, Receipt, Loader2, Printer, CalendarIcon, Download, X, ChevronDown, ChevronRight, Trash2, Ban } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { friendlyError } from "@/lib/friendlyMessage";
 import { usePermissions } from "@/hooks/usePermissions";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useQueryClient } from "@tanstack/react-query";
+
 
 import { cn } from "@/lib/utils";
 
@@ -31,10 +34,14 @@ const methodLabel: Record<string, string> = {
 export default function TransactionHistory() {
   const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
   const { hasPermission } = usePermissions();
+  const { isAdmin } = useUserRole();
+  const qc = useQueryClient();
   const canResetTransactions = hasPermission("action:reset_transactions");
-  
+
   const [search, setSearch] = useState("");
   const [resetting, setResetting] = useState(false);
+  const [voidingId, setVoidingId] = useState<string | null>(null);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<OrderItemRow[]>([]);
   const [loadingExpand, setLoadingExpand] = useState(false);
@@ -181,7 +188,26 @@ export default function TransactionHistory() {
     }
   };
 
+  const handleVoid = async (order: OrderRow) => {
+    setVoidingId(order.id);
+    try {
+      const { error } = await supabase.rpc("void_order", {
+        p_order_id: order.id,
+        p_reason: null,
+      });
+      if (error) throw error;
+      toast.success(`Pesanan ${order.order_number} dibatalkan, stok dikembalikan ✓`);
+      qc.invalidateQueries({ queryKey: ["products"] });
+      refetch();
+    } catch (err) {
+      toast.error(friendlyError(err, "Pesanan belum bisa dibatalkan."));
+    } finally {
+      setVoidingId(null);
+    }
+  };
+
   const formatDate = (iso: string) =>
+
     new Date(iso).toLocaleString("id-ID", {
       day: "2-digit",
       month: "short",
@@ -367,23 +393,59 @@ export default function TransactionHistory() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                disabled={previewLoading === o.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handlePrint(o);
-                                }}
-                                title="Preview & Cetak Struk"
-                              >
-                                {previewLoading === o.id ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <Printer className="h-4 w-4" />
+                              <div className="flex items-center justify-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  disabled={previewLoading === o.id}
+                                  onClick={() => handlePrint(o)}
+                                  title="Preview & Cetak Struk"
+                                >
+                                  {previewLoading === o.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Printer className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                {isAdmin && o.status === "completed" && (
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        disabled={voidingId === o.id}
+                                        title="Batalkan pesanan (kembalikan stok)"
+                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                      >
+                                        {voidingId === o.id ? (
+                                          <Loader2 className="h-4 w-4 animate-spin" />
+                                        ) : (
+                                          <Ban className="h-4 w-4" />
+                                        )}
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Batalkan pesanan {o.order_number}?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Status pesanan akan diubah menjadi <strong>cancelled</strong> dan stok produk akan dikembalikan secara otomatis. Tindakan ini tidak dapat dibatalkan.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Tidak</AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() => handleVoid(o)}
+                                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                        >
+                                          Ya, batalkan
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
                                 )}
-                              </Button>
+                              </div>
                             </TableCell>
+
                           </TableRow>
 
                           {/* Expanded detail panel */}
