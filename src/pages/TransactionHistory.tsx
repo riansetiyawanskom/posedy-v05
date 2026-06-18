@@ -34,10 +34,14 @@ const methodLabel: Record<string, string> = {
 export default function TransactionHistory() {
   const { orders, isLoading, refetch, fetchOrderItems } = useTransactionHistory();
   const { hasPermission } = usePermissions();
+  const { isAdmin } = useUserRole();
+  const qc = useQueryClient();
   const canResetTransactions = hasPermission("action:reset_transactions");
-  
+
   const [search, setSearch] = useState("");
   const [resetting, setResetting] = useState(false);
+  const [voidingId, setVoidingId] = useState<string | null>(null);
+
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<OrderItemRow[]>([]);
   const [loadingExpand, setLoadingExpand] = useState(false);
