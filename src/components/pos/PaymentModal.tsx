@@ -148,31 +148,6 @@ export function PaymentModal({ open, onClose, cart, onSuccess }: PaymentModalPro
   };
 
 
-      // Prepare receipt data
-      setReceiptData({
-        orderNumber,
-        date: new Date().toLocaleString("id-ID", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-        cashierName: user?.email ?? "Kasir",
-        cart: { ...cart },
-        paymentMethod: method,
-        cashAmount: method === "cash" ? cashNum : undefined,
-        change: method === "cash" ? Math.max(change, 0) : undefined,
-      });
-
-      setSuccess(true);
-      toast.success(`Pembayaran berhasil — pesanan ${orderNumber} ✓`);
-    } catch (err) {
-      toast.error(friendlyError(err, "Pembayaran belum bisa diproses. Silakan coba lagi."));
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handlePrint = () => {
     if (receiptRef.current) {
